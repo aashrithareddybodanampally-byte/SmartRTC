@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Portal - SmartRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #busMap {
+            height: 500px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .bus-list-item {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .bus-list-item:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--accent-cyan);
+        }
+
+        .bus-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 0.5rem;
+        }
+
+        .bus-route {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .bus-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--accent-green);
+        }
+
+        .status-delayed {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .complaint-form {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="user-header">
+        <div class="logo-section">
+            <span class="logo-icon">🚌</span>
+            <div>
+                <div class="logo">SmartRTC</div>
+                <div style="font-size: 0.85rem; color: var(--text-secondary);">User Portal</div>
+            </div>
+        </div>
+        <a href="landing.html" class="back-btn">← Back to Home</a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div style="margin-bottom: 3rem;">
+            <h1>Welcome, User!</h1>
+            <p style="color: var(--text-secondary);">Track buses in real-time and report issues</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1.5rem;">🎫 Fare-Based Ticket Booking</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Enter your fare amount and travel on any bus! Auto-calculates distance (₹2/km). Supports UPI, Cards, Net
+                Banking & Wallets.
+            </p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="booking.html" class="btn btn-primary">
+                    💳 Book Ticket Now
+                </a>
+                <button class="btn btn-secondary"
+                    onclick="document.getElementById('trackingSection').scrollIntoView({ behavior: 'smooth' })">
+                    🚌 Track Live Buses
+                </button>
+            </div>
+        </div>
+
+        <!-- GPS Bus Tracking Section -->
+        <div id="trackingSection"></div>
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1.5rem;">🗺️ Live Bus GPS Tracking</h2>
+
+            <div class="search-box">
+                <input type="text" class="form-input" id="busSearch" placeholder="Search by bus number or route..."
+                    style="flex: 1;" oninput="filterBuses(this.value)">
+                <button class="btn btn-primary" onclick="locateNearestBus()">
+                    📍 Find Nearest Bus
+                </button>
+            </div>
+
+            <div class="grid grid-2">
+                <!-- Bus List -->
+                <div>
+                    <h3 style="margin-bottom: 1rem;">Active Buses</h3>
+                    <div id="busList" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Map -->
+                <div>
+                    <div id="busMap"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample bus data
+        const buses = [
+            { number: '100', route: 'Secunderabad → Koti', status: 'active', lat: 17.385044, lng: 78.486671, eta: '5 min' },
+            { number: '49M', route: 'KPHB → Ameerpet', status: 'active', lat: 17.492940, lng: 78.391426, eta: '8 min' },
+            { number: '5K', route: 'Dilsukhnagar → Charminar', status: 'delayed', lat: 17.369022, lng: 78.524263, eta: '15 min' },
+            { number: '290U', route: 'Uppal → ECIL', status: 'active', lat: 17.406498, lng: 78.554253, eta: '3 min' },
+            { number: '219', route: 'Gachibowli → Ameerpet', status: 'active', lat: 17.440304, lng: 78.348915, eta: '12 min' },
+            { number: '18C', route: 'Mehdipatnam → Koti', status: 'active', lat: 17.397339, lng: 78.438640, eta: '6 min' },
+        ];
+
+        let map;
+        let markers = [];
+
+        // Initialize Map
+        function initMap() {
+            map = L.map('busMap').setView([17.385044, 78.486671], 12);
+
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+
+            // Add bus markers
+            buses.forEach(bus => {
+                const icon = L.divIcon({
+                    className: 'bus-marker',
+                    html: `<div style="background: ${bus.status === 'active' ? '#2ecc71' : '#ffc107'}; width: 30px; height: 30px; border-radius: 50%; border: 3px solid #0a0e27; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">🚌</div>`,
+                    iconSize: [30, 30]
+                });
+
+                const marker = L.marker([bus.lat, bus.lng], { icon })
+                    .addTo(map)
+                    .bindPopup(`
+                        <div style="color: #0a0e27; padding: 0.5rem;">
+                            <h4 style="color: #0a0e27; margin-bottom: 0.5rem;">Bus ${bus.number}</h4>
+                            <p style="margin-bottom: 0.25rem;"><strong>Route:</strong> ${bus.route}</p>
+                            <p style="margin-bottom: 0.25rem;"><strong>ETA:</strong> ${bus.eta}</p>
+                            <p><strong>Status:</strong> ${bus.status === 'active' ? '✓ On Time' : '⚠ Delayed'}</p>
+                        </div>
+                    `);
+
+                markers.push(marker);
+            });
+        }
+
+        // Display Bus List
+        function displayBusList(busesToShow = buses) {
+            const busList = document.getElementById('busList');
+            busList.innerHTML = busesToShow.map(bus => `
+                <div class="bus-list-item" onclick="focusBus(${bus.lat}, ${bus.lng})">
+                    <div class="bus-number">Bus ${bus.number}</div>
+                    <div class="bus-route">📍 ${bus.route}</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                        <span class="bus-status ${bus.status === 'active' ? 'status-active' : 'status-delayed'}">
+                            ${bus.status === 'active' ? 'On Time' : 'Delayed'}
+                        </span>
+                        <span style="color: var(--text-secondary); font-size: 0.9rem;">
+                            ETA: ${bus.eta}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter Buses
+        function filterBuses(query) {
+            const filtered = buses.filter(bus =>
+                bus.number.toLowerCase().includes(query.toLowerCase()) ||
+                bus.route.toLowerCase().includes(query.toLowerCase())
+            );
+            displayBusList(filtered);
+        }
+
+        // Focus on Bus
+        function focusBus(lat, lng) {
+            map.setView([lat, lng], 15);
+        }
+
+        // Locate Nearest Bus
+        function locateNearestBus() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const userLat = position.coords.latitude;
+                    const userLng = position.coords.longitude;
+
+                    // Calculate nearest bus (simplified)
+                    let nearest = buses[0];
+                    let minDistance = Infinity;
+
+                    buses.forEach(bus => {
+                        const distance = Math.sqrt(
+                            Math.pow(bus.lat - userLat, 2) +
+                            Math.pow(bus.lng - userLng, 2)
+                        );
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            nearest = bus;
+                        }
+                    });
+
+                    focusBus(nearest.lat, nearest.lng);
+                    showToast(`Nearest bus: ${nearest.number} - ${nearest.route}`, 'success');
+                }, () => {
+                    showToast('Unable to get your location', 'error');
+                });
+            } else {
+                showToast('Geolocation not supported', 'error');
+            }
+        }
+
+        const API_BASE = 'http://localhost:8000';
+
+        // Toast Notification
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.5rem;">
+                        ${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}
+                    </span>
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        window.addEventListener('load', () => {
+            initMap();
+            displayBusList();
+        });
+    </script>
+</body>
+
+</html>

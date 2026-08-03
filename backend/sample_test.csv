@@ -1,0 +1,6 @@
+from_stop,to_stop,time,passenger_count,fare
+Secunderabad,Koti,2024-01-15 08:30:00,45,25
+KPHB,Ameerpet,2024-01-15 09:15:00,38,30
+Banjara Hills,Secunderabad,2024-01-15 10:00:00,52,35
+Hitech City,Kukatpally,2024-01-15 11:30:00,41,28
+Dilsukhnagar,Begumpet,2024-01-15 12:45:00,37,22

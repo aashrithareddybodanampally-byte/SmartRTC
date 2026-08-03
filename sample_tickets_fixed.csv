@@ -1,0 +1,31 @@
+from_stop,to_stop,time,passenger_count,fare
+JNTU,Ameerpet,2024-01-15 08:30:00,45,25
+JNTU,Ameerpet,2024-01-15 09:00:00,48,25
+JNTU,Ameerpet,2024-01-15 17:30:00,52,25
+JNTU,Ameerpet,2024-01-16 08:30:00,50,25
+JNTU,Ameerpet,2024-01-16 09:00:00,46,25
+Secunderabad,Kukatpally,2024-01-15 07:00:00,38,30
+Secunderabad,Kukatpally,2024-01-15 08:00:00,42,30
+Secunderabad,Kukatpally,2024-01-15 18:00:00,35,30
+Secunderabad,Kukatpally,2024-01-16 07:00:00,40,30
+Secunderabad,Kukatpally,2024-01-16 08:00:00,39,30
+Dilsukhnagar,Uppal,2024-01-15 09:30:00,28,20
+Dilsukhnagar,Uppal,2024-01-15 10:00:00,30,20
+Dilsukhnagar,Uppal,2024-01-15 18:30:00,25,20
+Dilsukhnagar,Uppal,2024-01-16 09:30:00,27,20
+Dilsukhnagar,Uppal,2024-01-16 10:00:00,29,20
+Miyapur,Begumpet,2024-01-15 06:30:00,55,35
+Miyapur,Begumpet,2024-01-15 07:00:00,58,35
+Miyapur,Begumpet,2024-01-15 17:00:00,60,35
+Miyapur,Begumpet,2024-01-16 06:30:00,57,35
+Miyapur,Begumpet,2024-01-16 07:00:00,59,35
+LB Nagar,Charminar,2024-01-15 10:00:00,22,18
+LB Nagar,Charminar,2024-01-15 11:00:00,20,18
+LB Nagar,Charminar,2024-01-15 19:00:00,18,18
+LB Nagar,Charminar,2024-01-16 10:00:00,21,18
+LB Nagar,Charminar,2024-01-16 11:00:00,19,18
+Gachibowli,Hi-Tech City,2024-01-15 08:00:00,65,40
+Gachibowli,Hi-Tech City,2024-01-15 08:30:00,70,40
+Gachibowli,Hi-Tech City,2024-01-15 18:00:00,68,40
+Gachibowli,Hi-Tech City,2024-01-16 08:00:00,66,40
+Gachibowli,Hi-Tech City,2024-01-16 08:30:00,72,40

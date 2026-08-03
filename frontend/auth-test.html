@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auth Test - TSRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .test-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 2rem;
+        }
+
+        .status-box {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+
+        .success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .error {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .info {
+            background: rgba(0, 191, 255, 0.1);
+            border: 1px solid #00bfff;
+            color: #00bfff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="test-container">
+        <div class="glass-card">
+            <h1>🔍 Authentication Diagnostic Tool</h1>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+                This page helps diagnose authentication issues
+            </p>
+
+            <div id="results"></div>
+
+            <div style="margin-top: 2rem;">
+                <button onclick="runTests()" class="btn btn-primary">🔄 Run Tests</button>
+                <button onclick="clearAuth()" class="btn btn-secondary">🗑️ Clear Auth Data</button>
+                <a href="index.html" class="btn btn-secondary">← Back to Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        function addResult(title, message, type = 'info') {
+            const results = document.getElementById('results');
+            const box = document.createElement('div');
+            box.className = `status-box ${type}`;
+            box.innerHTML = `<strong>${title}:</strong><br>${message}`;
+            results.appendChild(box);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function runTests() {
+            clearResults();
+
+            // Test 1: Check if auth token exists
+            const token = localStorage.getItem('auth_token');
+            if (token) {
+                addResult('✓ Auth Token', `Token found: ${token.substring(0, 20)}...`, 'success');
+            } else {
+                addResult('✗ Auth Token', 'No token found in localStorage', 'error');
+            }
+
+            // Test 2: Check user data
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                try {
+                    const user = JSON.parse(userStr);
+                    addResult('✓ User Data', `Username: ${user.username} | Role: ${user.role}`, 'success');
+                } catch (e) {
+                    addResult('✗ User Data', `Invalid JSON: ${userStr}`, 'error');
+                }
+            } else {
+                addResult('✗ User Data', 'No user data found', 'error');
+            }
+
+            // Test 3: Check TSRTC object
+            if (window.TSRTC) {
+                addResult('✓ TSRTC Object', 'TSRTC object is loaded', 'success');
+            } else {
+                addResult('✗ TSRTC Object', 'TSRTC object not found', 'error');
+            }
+
+            // Test 4: Check isAuthenticated()
+            if (TSRTC.auth) {
+                const isAuth = TSRTC.auth.isAuthenticated();
+                if (isAuth) {
+                    addResult('✓ Authentication Check', 'User is authenticated', 'success');
+                } else {
+                    addResult('✗ Authentication Check', 'User is NOT authenticated', 'error');
+                }
+            }
+
+            // Test 5: Try a test API call
+            if (token) {
+                try {
+                    addResult('⏳ API Test', 'Testing login endpoint...', 'info');
+
+                    const response = await fetch('http://localhost:8000/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username: 'admin', password: 'admin123' })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        addResult('✓ Login API', `Login successful! Token received: ${data.access_token.substring(0, 20)}...`, 'success');
+                    } else {
+                        const error = await response.text();
+                        addResult('✗ Login API', `Login failed: ${error}`, 'error');
+                    }
+                } catch (error) {
+                    addResult('✗ API Connection', `Cannot connect to backend: ${error.message}`, 'error');
+                }
+            }
+        }
+
+        function clearAuth() {
+            localStorage.removeItem('auth_token');
+            localStorage.removeItem('user');
+            addResult('✓ Cleared', 'Authentication data cleared', 'success');
+            setTimeout(() => runTests(), 500);
+        }
+
+        // Auto-run tests on load
+        window.addEventListener('load', runTests);
+    </script>
+</body>
+
+</html>

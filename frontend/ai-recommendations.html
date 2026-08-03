@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recommendations - SmartRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        .recommendation-card {
+            background: var(--glass-bg);
+            border-left: 4px solid var(--accent-cyan);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .recommendation-card.high-priority {
+            border-left-color: var(--accent-red);
+            background: rgba(255, 71, 87, 0.05);
+        }
+
+        .recommendation-card.medium-priority {
+            border-left-color: #ffc107;
+            background: rgba(255, 193, 7, 0.05);
+        }
+
+        .recommendation-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .priority-high {
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--accent-red);
+        }
+
+        .priority-medium {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .priority-low {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--accent-green);
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .metric-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: rgba(0, 212, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .reasoning-list {
+            list-style: none;
+            padding: 0;
+            margin: 1rem 0;
+        }
+
+        .reasoning-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .reasoning-list li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-cyan);
+            font-weight: 700;
+        }
+
+        .confidence-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: var(--gradient-accent);
+            transition: width 0.6s ease;
+        }
+
+        .action-type-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .loading-shimmer {
+            background: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0.05) 25%,
+                    rgba(255, 255, 255, 0.1) 50%,
+                    rgba(255, 255, 255, 0.05) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% 0;
+            }
+
+            100% {
+                background-position: 200% 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">SmartRTC</div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="upload.html">Upload Data</a></li>
+                <li><a href="analytics.html">OD Analytics</a></li>
+                <li><a href="profitability.html">Profitability</a></li>
+                <li><a href="ai-recommendations.html" class="active">AI Insights</a></li>
+
+                <li><a href="maps.html">Maps</a></li>
+                <li><a href="#" onclick="TSRTC.auth.logout(); return false;">Logout</a></li>
+                <li class="user-info"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Header -->
+        <div style="margin-bottom: 2rem;">
+            <h1>🤖 AI-Powered Decision Recommendations</h1>
+            <p style="color: var(--text-secondary);">
+                Intelligent analysis with explainable reasoning for route optimization
+            </p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-4" style="margin-bottom: 2rem;">
+            <div class="metric-card stagger-1">
+                <div class="metric-label">Total Recommendations</div>
+                <div class="metric-value" id="totalRecommendations">--</div>
+            </div>
+            <div class="metric-card stagger-2">
+                <div class="metric-label">High Priority</div>
+                <div class="metric-value" id="highPriority">--</div>
+            </div>
+            <div class="metric-card stagger-3">
+                <div class="metric-label">Optimization Potential</div>
+                <div class="metric-value" id="potentialSavings">--</div>
+            </div>
+            <div class="metric-card stagger-4">
+                <div class="metric-label">Avg Profit Margin</div>
+                <div class="metric-value" id="avgMargin">--</div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3>Generate New Recommendations</h3>
+                    <p style="color: var(--text-secondary); margin-top: 0.5rem;">
+                        AI will analyze current data and generate actionable insights
+                    </p>
+                </div>
+                <button class="btn btn-primary" onclick="generateRecommendations()" id="generateBtn">
+                    🚀 Generate Recommendations
+                </button>
+            </div>
+        </div>
+
+        <!-- Recommendations List -->
+        <div id="recommendationsList">
+            <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🤖</div>
+                <h3>No Recommendations Yet</h3>
+                <p>Click "Generate Recommendations" to get AI-powered insights</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        TSRTC.requireAuth();
+        let currentRecommendations = [];
+
+        async function generateRecommendations() {
+            const btn = document.getElementById('generateBtn');
+            const container = document.getElementById('recommendationsList');
+
+            btn.disabled = true;
+            btn.innerHTML = '⏳ Analyzing...';
+
+            // Show loading state
+            container.innerHTML = `
+                <div class="glass-card loading-shimmer" style="height: 200px; margin-bottom: 1rem;"></div>
+                <div class="glass-card loading-shimmer" style="height: 200px; margin-bottom: 1rem;"></div>
+                <div class="glass-card loading-shimmer" style="height: 200px;"></div>
+            `;
+
+            try {
+                const data = await TSRTC.api.getAIRecommendations();
+                currentRecommendations = data.recommendations;
+
+                // Update summary
+                document.getElementById('totalRecommendations').textContent = data.total_recommendations;
+                document.getElementById('highPriority').textContent =
+                    data.recommendations.filter(r => r.priority === 'high').length;
+                document.getElementById('potentialSavings').textContent = data.summary.optimization_potential;
+                document.getElementById('avgMargin').textContent = data.summary.avg_profit_margin.toFixed(1) + '%';
+
+                // Display recommendations
+                displayRecommendations(data.recommendations);
+
+                TSRTC.notify.success('AI recommendations generated successfully!');
+            } catch (error) {
+                console.error('Error:', error);
+                TSRTC.notify.error('Failed to generate recommendations');
+                container.innerHTML = `
+                    <div class="glass-card" style="text-align: center; padding: 2rem;">
+                        <p style="color: var(--accent-red); margin-bottom: 1rem;">${error.message}</p>
+                        <button class="btn btn-secondary" onclick="generateRecommendations()">Retry</button>
+                    </div>
+                `;
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Generate Recommendations';
+            }
+        }
+
+        function displayRecommendations(recommendations) {
+            const container = document.getElementById('recommendationsList');
+
+            if (recommendations.length === 0) {
+                container.innerHTML = '<div class="glass-card"><p>No recommendations available.</p></div>';
+                return;
+            }
+
+            container.innerHTML = recommendations.map((rec, index) => `
+                <div class="recommendation-card ${rec.priority}-priority">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div style="flex: 1;">
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                                <div class="action-type-icon">${getTypeIcon(rec.type)}</div>
+                                <div>
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <h3 style="margin: 0;">${formatType(rec.type)}</h3>
+                                        <span class="priority-badge priority-${rec.priority}">${rec.priority}</span>
+                                    </div>
+                                    <div style="color: var(--text-secondary); margin-top: 0.25rem;">
+                                        ${rec.route}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 0.85rem; color: var(--text-muted);">Confidence</div>
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-cyan);">
+                                ${(rec.confidence * 100).toFixed(0)}%
+                            </div>
+                            <div class="confidence-bar" style="width: 100px;">
+                                <div class="confidence-fill" style="width: ${rec.confidence * 100}%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Current Metrics -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="margin-bottom: 0.75rem;">📊 Current Metrics</h4>
+                        <div class="metric-grid">
+                            ${Object.entries(rec.current_metrics).map(([key, value]) => `
+                                <div class="metric-item">
+                                    <div class="metric-value">${formatMetricValue(key, value)}</div>
+                                    <div class="metric-label">${formatLabel(key)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Recommendation -->
+                    <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(0, 212, 255, 0.1); border-radius: 8px;">
+                        <h4 style="margin-bottom: 0.75rem;">💡 AI Recommendation</h4>
+                        ${Object.entries(rec.recommendation).map(([key, value]) => `
+                            <div style="margin-bottom: 0.5rem;">
+                                <strong style="color: var(--accent-cyan);">${formatLabel(key)}:</strong>
+                                <span style="color: var(--text-primary);">${value}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Projected Impact -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="margin-bottom: 0.75rem;">📈 Projected Impact</h4>
+                        <div class="impact-grid">
+                            ${Object.entries(rec.projected_impact).map(([key, value]) => `
+                                <div style="text-align: center;">
+                                    <div style="font-size: 1.3rem; font-weight: 700; color: ${value.toString().includes('+') ? 'var(--accent-green)' : value.toString().includes('-') ? 'var(--accent-red)' : 'var(--text-primary)'};">
+                                        ${value}
+                                    </div>
+                                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                                        ${formatLabel(key)}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Reasoning -->
+                    <div>
+                        <h4 style="margin-bottom: 0.75rem;">🧠 AI Reasoning</h4>
+                        <ul class="reasoning-list">
+                            ${rec.reasoning.map(reason => `<li>${reason}</li>`).join('')}
+                        </ul>
+                    </div>
+
+                    <!-- Actions -->
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--glass-border); display: flex; gap: 1rem;">
+                        <button class="btn btn-primary" onclick="implementRecommendation(${index})">
+                            ✓ Implement
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportRecommendation(${index})">
+                            📄 Export Report
+                        </button>
+                        <button class="btn btn-secondary" onclick="dismissRecommendation(${index})">
+                            ✕ Dismiss
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getTypeIcon(type) {
+            const icons = {
+                'fare_adjustment': '💵',
+                'frequency_adjustment': '🔄',
+                'capacity_adjustment': '🚌',
+                'route_merge': '🔀'
+            };
+            return icons[type] || '📊';
+        }
+
+        function formatType(type) {
+            return type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        }
+
+        function formatLabel(key) {
+            return key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+        }
+
+        function formatMetricValue(key, value) {
+            if (typeof value === 'number') {
+                if (key.includes('revenue') || key.includes('profit') || key.includes('fare')) {
+                    return '₹' + value.toFixed(0);
+                }
+                if (key.includes('margin') || key.includes('rate')) {
+                    return value.toFixed(1) + '%';
+                }
+                return value.toFixed(0);
+            }
+            return value;
+        }
+
+        function implementRecommendation(index) {
+            const rec = currentRecommendations[index];
+            if (confirm(`Implement ${formatType(rec.type)} for ${rec.route}?`)) {
+                TSRTC.notify.success('Recommendation implementation scheduled');
+            }
+        }
+
+        function exportRecommendation(index) {
+            const rec = currentRecommendations[index];
+            const report = JSON.stringify(rec, null, 2);
+            const blob = new Blob([report], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `recommendation-${rec.type}-${Date.now()}.json`;
+            a.click();
+            TSRTC.notify.success('Report exported');
+        }
+
+        function dismissRecommendation(index) {
+            currentRecommendations.splice(index, 1);
+            displayRecommendations(currentRecommendations);
+            TSRTC.notify.info('Recommendation dismissed');
+        }
+    </script>
+</body>
+
+</html>

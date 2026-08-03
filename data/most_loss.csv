@@ -1,0 +1,551 @@
+from_stop,to_stop,time,passenger_count,fare
+Mahabubnagar,Warangal,2026-01-08 09:49:01,14,18
+Nizamabad,LB Nagar,2025-12-30 03:58:01,7,22
+Nizamabad,Siddipet,2026-01-02 00:57:01,13,17
+Warangal,LB Nagar,2026-01-03 15:43:01,13,14
+Ameerpet,Adilabad,2026-01-10 23:37:01,10,24
+Uppal,Khammam,2026-01-05 12:36:01,11,24
+Nizamabad,Suryapet,2026-02-03 03:05:01,14,23
+Mahabubnagar,Dilsukhnagar,2026-01-03 20:42:01,11,14
+Warangal,LB Nagar,2026-01-25 14:33:01,14,21
+Kukatpally,Siddipet,2026-01-24 02:40:01,6,29
+Kukatpally,Gachibowli,2026-02-04 18:17:01,6,15
+Ameerpet,LB Nagar,2026-02-06 06:27:01,10,19
+Gachibowli,Medak,2026-02-03 07:51:01,11,27
+Mahabubnagar,Hyderabad MGBS,2026-01-28 11:51:01,7,23
+Adilabad,Dilsukhnagar,2026-01-23 21:20:01,9,16
+Dilsukhnagar,Khammam,2026-01-19 04:48:01,7,19
+Hyderabad MGBS,JBS Secunderabad,2026-01-24 07:32:01,10,21
+Uppal,Nizamabad,2026-02-09 12:26:01,9,18
+Karimnagar,Adilabad,2026-01-16 09:40:01,4,18
+Adilabad,Nalgonda,2025-12-31 10:09:01,14,13
+Karimnagar,Hitech City,2026-01-23 00:54:01,5,19
+LB Nagar,Hitech City,2025-12-25 02:23:01,14,18
+Hyderabad MGBS,Mehdipatnam,2025-12-26 05:46:01,9,27
+Karimnagar,Hyderabad MGBS,2026-01-03 10:23:01,9,27
+Siddipet,Gachibowli,2026-01-18 05:27:01,8,30
+Medak,Siddipet,2026-02-06 22:08:01,12,27
+Gachibowli,Suryapet,2025-12-29 23:02:01,13,19
+Kukatpally,Siddipet,2025-12-30 05:51:01,6,26
+Uppal,Nizamabad,2026-01-06 04:47:01,8,25
+Kukatpally,Khammam,2026-02-08 00:57:01,14,12
+Hitech City,Kukatpally,2026-02-01 11:06:01,11,15
+LB Nagar,Mehdipatnam,2026-02-02 16:20:01,12,29
+Ameerpet,Warangal,2026-01-07 19:26:01,14,19
+Warangal,Mahabubnagar,2026-02-02 13:28:01,12,28
+Suryapet,Mahabubnagar,2026-01-09 19:19:01,8,27
+Hyderabad MGBS,Mahabubnagar,2025-12-30 12:22:01,9,30
+Khammam,Suryapet,2026-01-20 16:46:01,15,16
+Siddipet,LB Nagar,2026-02-05 10:13:01,3,15
+Kukatpally,Siddipet,2026-01-01 01:26:01,5,26
+Siddipet,LB Nagar,2026-01-24 14:11:01,7,29
+Nalgonda,Karimnagar,2026-01-25 01:36:01,4,13
+Suryapet,JBS Secunderabad,2026-01-02 22:53:01,5,18
+Gachibowli,Warangal,2026-01-31 18:21:01,3,20
+Warangal,Mehdipatnam,2026-01-13 02:52:01,4,21
+LB Nagar,Adilabad,2026-01-26 00:46:01,14,28
+Adilabad,Mehdipatnam,2026-01-25 05:53:01,13,16
+Uppal,Gachibowli,2026-01-22 19:07:01,12,22
+Siddipet,Nalgonda,2026-01-27 05:20:01,10,22
+Medak,Mahabubnagar,2025-12-28 15:28:01,13,22
+Mehdipatnam,Gachibowli,2026-01-03 18:30:01,9,21
+Karimnagar,Hitech City,2025-12-26 17:20:01,8,17
+Medak,Nalgonda,2026-01-07 08:34:01,12,20
+Nizamabad,Karimnagar,2026-01-26 09:58:01,12,25
+Mehdipatnam,Dilsukhnagar,2026-01-11 19:32:01,4,18
+Hitech City,Uppal,2026-01-18 20:49:01,4,29
+Khammam,Karimnagar,2026-01-04 02:54:01,11,19
+Mehdipatnam,Karimnagar,2025-12-27 19:57:01,5,23
+Kukatpally,Dilsukhnagar,2026-01-16 16:31:01,13,16
+Suryapet,Hitech City,2026-02-02 19:18:01,5,26
+Nalgonda,Nizamabad,2026-02-06 10:46:01,8,16
+Khammam,JBS Secunderabad,2026-01-10 00:27:01,9,20
+Adilabad,Ameerpet,2026-01-15 12:23:01,15,22
+Nizamabad,Karimnagar,2026-01-10 12:48:01,14,16
+Uppal,Warangal,2025-12-31 14:46:01,11,12
+Karimnagar,Warangal,2026-01-20 15:52:01,9,14
+Mahabubnagar,Adilabad,2026-02-03 16:16:01,11,13
+Karimnagar,Nalgonda,2025-12-29 16:00:01,8,12
+Mahabubnagar,Adilabad,2026-02-08 17:31:01,15,26
+Adilabad,Hitech City,2026-01-09 06:39:01,13,23
+Nizamabad,Dilsukhnagar,2026-01-31 02:26:01,3,22
+Uppal,Suryapet,2026-01-22 18:52:01,11,26
+Warangal,Uppal,2025-12-26 16:33:01,5,25
+Medak,Mehdipatnam,2026-02-02 14:13:01,9,13
+Kukatpally,Nizamabad,2026-01-18 13:08:01,6,26
+Hyderabad MGBS,Nizamabad,2025-12-28 01:31:01,15,24
+Uppal,Nizamabad,2026-02-04 19:43:01,13,30
+Karimnagar,Dilsukhnagar,2026-02-08 04:45:01,14,25
+LB Nagar,Nalgonda,2026-01-16 15:30:01,12,23
+Gachibowli,Adilabad,2026-02-04 10:18:01,5,18
+Hitech City,Dilsukhnagar,2025-12-30 03:03:01,6,24
+Dilsukhnagar,Ameerpet,2026-01-09 18:07:01,5,24
+Adilabad,Suryapet,2026-01-05 20:03:01,15,14
+JBS Secunderabad,Medak,2026-01-13 01:37:01,14,28
+Adilabad,Suryapet,2026-01-03 07:02:01,15,21
+Siddipet,Nizamabad,2026-01-23 09:16:01,10,14
+Medak,Suryapet,2026-01-05 20:04:01,14,21
+Warangal,LB Nagar,2025-12-26 17:12:01,13,24
+Ameerpet,Adilabad,2026-02-03 02:49:01,7,16
+Gachibowli,Hitech City,2026-01-27 06:45:01,12,27
+Karimnagar,Hitech City,2026-01-10 21:08:01,3,14
+Khammam,Medak,2026-02-03 05:20:01,8,15
+Hyderabad MGBS,Uppal,2025-12-26 17:52:01,6,16
+Dilsukhnagar,Hyderabad MGBS,2026-01-04 01:49:01,7,26
+Hyderabad MGBS,Dilsukhnagar,2026-01-18 06:41:01,8,17
+Siddipet,Hyderabad MGBS,2026-01-28 05:00:01,15,22
+Adilabad,LB Nagar,2025-12-26 14:25:01,8,25
+Mahabubnagar,Karimnagar,2026-01-10 06:38:01,13,19
+Hitech City,Karimnagar,2026-01-30 04:41:01,7,22
+Dilsukhnagar,JBS Secunderabad,2026-01-23 18:52:01,10,16
+Karimnagar,Mehdipatnam,2026-02-01 04:30:01,4,12
+JBS Secunderabad,Hyderabad MGBS,2026-01-22 02:13:01,6,18
+Suryapet,Mehdipatnam,2026-01-06 23:25:01,13,12
+Karimnagar,Khammam,2026-01-25 14:47:01,3,19
+Khammam,Ameerpet,2026-01-10 19:43:01,10,28
+Siddipet,Ameerpet,2026-02-07 05:01:01,9,12
+Medak,JBS Secunderabad,2026-01-04 01:20:01,3,27
+Medak,Gachibowli,2026-01-24 16:31:01,7,25
+Hitech City,Karimnagar,2026-01-31 07:54:01,10,16
+Kukatpally,Khammam,2026-02-02 20:31:01,10,15
+Adilabad,Gachibowli,2026-02-09 21:17:01,15,16
+Suryapet,Mehdipatnam,2025-12-27 14:43:01,5,13
+Mahabubnagar,Mehdipatnam,2026-02-10 10:52:01,15,13
+Suryapet,Uppal,2026-01-17 16:49:01,8,24
+Warangal,Mahabubnagar,2026-01-20 01:30:01,3,13
+Mehdipatnam,Nizamabad,2026-01-20 05:03:01,5,12
+LB Nagar,Hyderabad MGBS,2026-01-02 05:13:01,4,21
+Medak,Karimnagar,2026-01-13 00:06:01,4,14
+Adilabad,Hitech City,2026-01-14 21:59:01,6,26
+Warangal,Adilabad,2026-01-10 03:35:01,12,17
+Hitech City,Mahabubnagar,2026-02-06 06:04:01,13,17
+Adilabad,Mehdipatnam,2026-01-25 04:43:01,12,25
+LB Nagar,Nizamabad,2026-01-06 08:43:01,15,25
+Ameerpet,Medak,2026-01-25 21:03:01,14,27
+Ameerpet,Siddipet,2026-02-07 21:15:01,7,30
+Mehdipatnam,JBS Secunderabad,2026-02-10 20:53:01,15,23
+Ameerpet,Mahabubnagar,2026-01-26 17:10:01,7,18
+Siddipet,Medak,2026-02-03 11:55:01,7,16
+Dilsukhnagar,Khammam,2026-01-02 00:50:01,14,20
+Uppal,Siddipet,2026-02-04 13:17:01,12,21
+Hyderabad MGBS,Dilsukhnagar,2026-01-15 19:45:01,4,26
+Suryapet,Siddipet,2026-01-17 17:24:01,5,25
+Karimnagar,Uppal,2026-01-12 10:50:01,5,17
+Suryapet,Gachibowli,2026-01-29 13:56:01,6,13
+Ameerpet,JBS Secunderabad,2026-02-01 20:10:01,8,21
+Siddipet,Medak,2025-12-27 05:51:01,11,15
+Dilsukhnagar,Mahabubnagar,2025-12-31 09:38:01,4,25
+Nalgonda,Hitech City,2026-01-12 21:54:01,14,25
+Mehdipatnam,Adilabad,2026-02-09 00:13:01,13,22
+Medak,Uppal,2026-02-07 03:14:01,5,16
+Suryapet,Warangal,2025-12-28 12:45:01,13,29
+Suryapet,Siddipet,2026-02-06 03:36:01,8,22
+Nizamabad,JBS Secunderabad,2026-01-06 00:36:01,3,27
+Mehdipatnam,Khammam,2026-02-02 07:48:01,3,17
+Ameerpet,LB Nagar,2026-02-06 12:06:01,12,24
+LB Nagar,Nizamabad,2026-01-01 01:38:01,4,27
+Hyderabad MGBS,Warangal,2026-02-05 03:20:01,8,30
+Adilabad,Uppal,2025-12-29 21:12:01,6,17
+LB Nagar,Nizamabad,2025-12-29 10:38:01,6,17
+Mahabubnagar,Hitech City,2026-01-29 11:37:01,5,28
+Siddipet,Uppal,2026-01-06 15:21:01,10,23
+Siddipet,Hyderabad MGBS,2026-01-28 20:15:01,6,30
+Mehdipatnam,Khammam,2026-01-20 15:57:01,15,27
+Hyderabad MGBS,LB Nagar,2026-01-03 08:24:01,13,21
+Suryapet,Nizamabad,2026-01-19 17:36:01,15,29
+Gachibowli,LB Nagar,2026-01-15 13:59:01,15,18
+LB Nagar,Karimnagar,2026-01-10 15:49:01,5,29
+Ameerpet,Hyderabad MGBS,2026-01-31 22:28:01,13,22
+Hyderabad MGBS,Uppal,2026-01-14 17:35:01,6,18
+Gachibowli,Dilsukhnagar,2026-01-14 19:07:01,15,18
+Kukatpally,Nalgonda,2026-01-28 16:17:01,15,22
+Uppal,Dilsukhnagar,2026-02-07 04:45:01,15,15
+JBS Secunderabad,Karimnagar,2026-01-30 08:01:01,4,26
+Siddipet,Nizamabad,2026-01-20 14:25:01,13,29
+Kukatpally,Uppal,2025-12-28 06:31:01,15,23
+Nizamabad,Suryapet,2026-01-28 03:35:01,12,22
+Dilsukhnagar,Hyderabad MGBS,2026-02-05 18:32:01,7,22
+Warangal,Dilsukhnagar,2026-01-20 01:46:01,5,13
+Khammam,Warangal,2026-01-13 20:40:01,5,21
+Mehdipatnam,Karimnagar,2026-01-04 04:22:01,13,26
+Medak,Nizamabad,2026-01-02 05:56:01,5,12
+Khammam,Karimnagar,2026-01-17 10:48:01,6,26
+Nalgonda,JBS Secunderabad,2026-02-06 02:06:01,8,19
+Uppal,Warangal,2025-12-25 03:15:01,3,17
+Ameerpet,Mahabubnagar,2026-01-31 16:45:01,3,27
+Nalgonda,Warangal,2026-01-26 06:46:01,9,12
+Suryapet,Nalgonda,2026-01-20 07:17:01,5,28
+Hyderabad MGBS,Nalgonda,2026-01-05 03:37:01,13,29
+Gachibowli,Nalgonda,2026-01-01 06:30:01,9,29
+Mahabubnagar,Ameerpet,2026-01-07 16:42:01,9,27
+Karimnagar,LB Nagar,2026-02-05 11:22:01,11,28
+LB Nagar,Khammam,2026-01-28 11:30:01,3,19
+JBS Secunderabad,Kukatpally,2026-01-29 01:31:01,10,28
+Uppal,Kukatpally,2025-12-28 08:53:01,12,29
+Adilabad,Suryapet,2026-01-31 21:34:01,6,22
+Mehdipatnam,Mahabubnagar,2026-01-14 22:37:01,10,19
+Adilabad,Nizamabad,2026-02-05 03:35:01,11,19
+Suryapet,LB Nagar,2026-01-31 23:38:01,13,23
+Kukatpally,Dilsukhnagar,2026-01-28 04:01:01,6,21
+Mahabubnagar,LB Nagar,2026-01-04 15:09:01,11,26
+Mahabubnagar,LB Nagar,2026-02-05 03:20:01,13,17
+Gachibowli,Mahabubnagar,2026-01-08 21:08:01,11,27
+JBS Secunderabad,Medak,2026-02-01 14:33:01,15,13
+Warangal,Ameerpet,2026-01-08 21:24:01,15,23
+JBS Secunderabad,Kukatpally,2025-12-26 05:04:01,5,14
+Adilabad,Ameerpet,2026-01-03 15:49:01,4,28
+Nizamabad,Adilabad,2026-01-14 06:01:01,15,15
+Ameerpet,Hitech City,2026-02-03 18:38:01,7,16
+Hitech City,Mahabubnagar,2026-01-17 15:09:01,3,23
+JBS Secunderabad,Mahabubnagar,2026-02-05 22:14:01,4,14
+Suryapet,Khammam,2026-01-31 15:31:01,14,30
+Hitech City,Warangal,2025-12-26 10:43:01,4,21
+Warangal,Dilsukhnagar,2026-01-20 19:38:01,14,13
+Ameerpet,Dilsukhnagar,2026-02-07 12:47:01,14,21
+Karimnagar,Gachibowli,2026-01-05 10:59:01,4,14
+Hyderabad MGBS,Mehdipatnam,2025-12-28 15:13:01,5,27
+Karimnagar,Nizamabad,2026-01-10 23:28:01,14,30
+Nizamabad,Mahabubnagar,2026-01-22 01:56:01,8,19
+Gachibowli,Ameerpet,2026-01-25 06:43:01,12,21
+Warangal,JBS Secunderabad,2026-01-16 19:46:01,3,22
+Nizamabad,Suryapet,2026-01-31 09:59:01,8,18
+Siddipet,Mahabubnagar,2026-02-02 21:22:01,12,18
+Mahabubnagar,Ameerpet,2026-02-11 05:05:01,11,15
+Warangal,Nalgonda,2026-01-22 21:17:01,5,22
+Medak,Khammam,2026-01-02 19:48:01,4,14
+Ameerpet,Karimnagar,2026-02-01 05:17:01,15,30
+Karimnagar,LB Nagar,2025-12-26 11:34:01,6,29
+Suryapet,Khammam,2026-01-07 08:42:01,4,19
+Karimnagar,Nizamabad,2026-01-02 18:11:01,3,29
+Kukatpally,Khammam,2026-01-01 01:08:01,5,28
+Karimnagar,Siddipet,2026-01-31 22:25:01,5,18
+Karimnagar,Mehdipatnam,2025-12-25 16:26:01,14,29
+Dilsukhnagar,Adilabad,2026-01-28 14:48:01,5,12
+Gachibowli,Warangal,2026-02-10 22:15:01,12,25
+Dilsukhnagar,Khammam,2026-01-24 19:07:01,3,25
+Kukatpally,Nizamabad,2026-01-07 04:27:01,5,23
+Khammam,Siddipet,2026-01-10 04:42:01,15,17
+Nizamabad,Nalgonda,2026-01-16 14:39:01,3,29
+JBS Secunderabad,Karimnagar,2025-12-25 22:07:01,11,28
+LB Nagar,Karimnagar,2026-01-20 09:51:01,10,16
+Uppal,Adilabad,2025-12-25 00:00:01,13,25
+Siddipet,Khammam,2026-01-17 09:11:01,8,22
+Hyderabad MGBS,Khammam,2026-01-15 16:28:01,12,17
+Adilabad,Medak,2026-01-22 02:34:01,14,24
+Hyderabad MGBS,Dilsukhnagar,2026-01-09 04:17:01,13,15
+Uppal,Gachibowli,2026-01-20 00:44:01,14,12
+Adilabad,Mahabubnagar,2025-12-28 17:17:01,6,17
+Suryapet,Nizamabad,2026-02-07 16:21:01,10,14
+Nalgonda,Khammam,2026-01-25 16:41:01,8,28
+Medak,Hyderabad MGBS,2026-01-25 09:25:01,7,15
+LB Nagar,Dilsukhnagar,2026-02-07 01:50:01,5,17
+Mehdipatnam,Uppal,2025-12-30 21:52:01,4,30
+Uppal,LB Nagar,2026-02-05 11:46:01,14,17
+Gachibowli,Mahabubnagar,2026-01-03 05:24:01,15,15
+Siddipet,Gachibowli,2026-01-08 00:10:01,11,25
+Nalgonda,Kukatpally,2025-12-25 17:24:01,15,23
+Nalgonda,Karimnagar,2026-01-20 13:03:01,7,14
+Dilsukhnagar,Warangal,2026-01-03 06:00:01,8,16
+Hitech City,Warangal,2025-12-27 09:31:01,13,23
+Siddipet,Hyderabad MGBS,2026-01-16 15:22:01,12,29
+Warangal,Gachibowli,2026-01-03 01:46:01,10,15
+Ameerpet,Mehdipatnam,2026-01-09 00:29:01,14,22
+Suryapet,Uppal,2026-01-24 14:30:01,6,14
+Mahabubnagar,Kukatpally,2026-01-23 15:09:01,5,17
+Warangal,Dilsukhnagar,2026-01-02 23:37:01,5,30
+Gachibowli,Adilabad,2026-01-22 02:46:01,11,29
+Karimnagar,Uppal,2026-01-04 00:06:01,10,13
+Siddipet,Medak,2026-01-26 15:33:01,12,20
+Dilsukhnagar,Ameerpet,2026-02-10 22:31:01,15,28
+Hitech City,Karimnagar,2026-02-05 05:09:01,12,24
+Uppal,Karimnagar,2025-12-26 22:37:01,4,18
+Nizamabad,Hyderabad MGBS,2026-01-08 19:31:01,4,12
+Ameerpet,Adilabad,2026-01-27 15:34:01,11,18
+Khammam,Dilsukhnagar,2026-02-08 16:46:01,5,27
+Dilsukhnagar,Hyderabad MGBS,2026-01-31 21:25:01,13,13
+Hyderabad MGBS,Karimnagar,2026-02-04 00:03:01,6,13
+Khammam,Siddipet,2026-02-07 02:11:01,15,17
+LB Nagar,Ameerpet,2026-01-07 09:07:01,11,27
+Khammam,Mahabubnagar,2026-01-23 07:16:01,6,15
+Ameerpet,Dilsukhnagar,2025-12-25 22:20:01,12,18
+LB Nagar,JBS Secunderabad,2026-01-15 13:37:01,10,16
+Dilsukhnagar,Adilabad,2025-12-28 08:46:01,14,19
+Uppal,Karimnagar,2026-01-18 12:51:01,12,20
+LB Nagar,Dilsukhnagar,2026-01-25 08:49:01,9,12
+Nizamabad,Adilabad,2025-12-25 23:54:01,4,30
+Nizamabad,Mehdipatnam,2026-01-08 09:47:01,3,14
+Nizamabad,Medak,2025-12-28 09:35:01,6,23
+JBS Secunderabad,Mehdipatnam,2026-02-09 02:08:01,13,29
+Dilsukhnagar,Mehdipatnam,2025-12-25 21:36:01,4,22
+Nizamabad,Nalgonda,2026-01-22 07:59:01,6,29
+Khammam,JBS Secunderabad,2026-01-20 10:07:01,12,19
+Nizamabad,Suryapet,2026-01-10 06:49:01,11,20
+Karimnagar,LB Nagar,2025-12-28 13:24:01,6,26
+Warangal,Ameerpet,2026-01-27 12:19:01,15,28
+Mahabubnagar,Hyderabad MGBS,2026-02-02 10:22:01,3,13
+Warangal,Uppal,2025-12-26 16:35:01,13,23
+Dilsukhnagar,Siddipet,2025-12-27 04:08:01,8,15
+Uppal,Nizamabad,2026-01-18 02:04:01,8,29
+Nizamabad,Hyderabad MGBS,2026-01-24 00:49:01,10,17
+LB Nagar,Hitech City,2026-01-08 09:13:01,14,17
+Mehdipatnam,Uppal,2026-02-09 07:22:01,5,25
+Nizamabad,Warangal,2026-02-03 23:41:01,7,16
+Kukatpally,Warangal,2026-01-08 08:44:01,9,24
+LB Nagar,Suryapet,2026-01-28 06:28:01,15,18
+Siddipet,Nizamabad,2026-01-11 00:43:01,7,23
+Medak,JBS Secunderabad,2025-12-28 11:27:01,4,29
+Adilabad,Ameerpet,2026-02-09 22:36:01,6,13
+JBS Secunderabad,Medak,2026-02-08 06:58:01,8,23
+Khammam,Medak,2026-01-27 13:27:01,11,16
+Mahabubnagar,Warangal,2026-01-05 11:33:01,10,15
+Kukatpally,LB Nagar,2026-02-04 14:28:01,12,13
+Karimnagar,Nalgonda,2026-01-18 21:56:01,5,24
+Hitech City,Ameerpet,2026-01-25 04:35:01,9,24
+Kukatpally,Ameerpet,2026-01-06 08:37:01,4,12
+Hitech City,Ameerpet,2026-01-05 04:58:01,5,23
+Gachibowli,Hitech City,2026-01-12 13:19:01,4,21
+Hyderabad MGBS,Nizamabad,2026-02-04 19:05:01,12,21
+Karimnagar,Warangal,2026-01-23 22:27:01,8,21
+Hitech City,Khammam,2025-12-30 22:56:01,4,24
+Karimnagar,Khammam,2026-01-12 00:42:01,4,15
+Nalgonda,Gachibowli,2026-02-02 20:17:01,4,22
+Karimnagar,Mehdipatnam,2026-01-06 23:38:01,13,26
+Kukatpally,Gachibowli,2026-01-02 20:01:01,5,24
+Gachibowli,Medak,2026-01-29 14:39:01,7,24
+Kukatpally,Nalgonda,2026-01-05 03:49:01,9,26
+Mahabubnagar,Dilsukhnagar,2026-02-05 12:25:01,8,27
+Dilsukhnagar,Uppal,2026-01-06 20:43:01,4,25
+Khammam,Dilsukhnagar,2026-01-02 22:19:01,8,28
+Kukatpally,Gachibowli,2026-02-04 22:22:01,15,26
+Dilsukhnagar,Siddipet,2026-02-09 20:14:01,13,29
+JBS Secunderabad,Siddipet,2026-01-19 09:23:01,7,12
+Uppal,Kukatpally,2026-02-05 11:09:01,7,13
+Siddipet,Hitech City,2026-01-22 18:39:01,4,13
+LB Nagar,Mehdipatnam,2026-01-23 01:55:01,12,17
+Adilabad,Uppal,2025-12-26 04:49:01,15,15
+Siddipet,JBS Secunderabad,2026-02-05 15:43:01,13,20
+Warangal,Medak,2026-02-05 18:54:01,7,27
+Siddipet,LB Nagar,2026-02-04 03:18:01,9,14
+Hitech City,Ameerpet,2026-01-02 15:36:01,9,27
+Khammam,Medak,2026-02-08 17:11:01,9,19
+Mehdipatnam,Nalgonda,2026-01-26 13:57:01,9,27
+Medak,Suryapet,2026-01-03 20:11:01,13,25
+Mehdipatnam,Mahabubnagar,2026-01-21 11:59:01,13,20
+Siddipet,Mehdipatnam,2025-12-26 22:37:01,3,29
+Nizamabad,Gachibowli,2026-02-11 03:09:01,15,24
+LB Nagar,Khammam,2025-12-31 08:47:01,5,19
+Nalgonda,LB Nagar,2026-01-23 11:47:01,8,29
+JBS Secunderabad,LB Nagar,2026-02-07 06:11:01,11,16
+Siddipet,Nalgonda,2026-01-14 00:49:01,3,26
+Uppal,Suryapet,2026-01-03 00:13:01,8,23
+Warangal,Mahabubnagar,2026-01-28 15:36:01,14,27
+Siddipet,Hitech City,2026-02-07 09:10:01,5,13
+Adilabad,Hyderabad MGBS,2026-01-26 00:55:01,10,28
+Siddipet,Gachibowli,2026-01-13 12:40:01,10,16
+Karimnagar,Ameerpet,2026-01-09 03:36:01,14,21
+Siddipet,Hyderabad MGBS,2026-01-20 15:29:01,15,23
+Adilabad,Khammam,2026-01-22 08:17:01,14,19
+Siddipet,LB Nagar,2026-01-24 10:24:01,13,17
+Khammam,Mahabubnagar,2025-12-25 13:15:01,11,25
+Adilabad,Siddipet,2026-02-08 12:27:01,13,18
+Dilsukhnagar,Warangal,2026-01-23 02:12:01,15,26
+Warangal,Mehdipatnam,2026-01-05 17:13:01,13,26
+Hyderabad MGBS,Dilsukhnagar,2026-02-09 11:01:01,14,14
+Ameerpet,Gachibowli,2026-02-06 06:09:01,7,25
+Dilsukhnagar,Mehdipatnam,2025-12-26 10:32:01,5,22
+Nalgonda,Ameerpet,2026-01-11 06:08:01,4,12
+Adilabad,Khammam,2026-01-31 03:49:01,4,17
+Mehdipatnam,Suryapet,2026-01-13 13:07:01,15,16
+Ameerpet,Adilabad,2025-12-25 13:04:01,5,17
+Siddipet,Adilabad,2026-01-07 02:47:01,9,20
+Medak,Uppal,2026-01-14 11:31:01,9,15
+Hyderabad MGBS,Siddipet,2025-12-31 15:23:01,13,12
+Adilabad,Dilsukhnagar,2026-01-18 23:16:01,11,24
+Gachibowli,Mehdipatnam,2026-01-16 13:12:01,10,24
+LB Nagar,Kukatpally,2026-01-22 13:00:01,5,22
+Medak,Ameerpet,2026-01-10 00:39:01,9,26
+Uppal,Warangal,2026-01-18 01:53:01,3,12
+Suryapet,Ameerpet,2026-01-03 06:02:01,13,12
+Mahabubnagar,Nalgonda,2026-02-02 06:15:01,13,13
+Karimnagar,LB Nagar,2026-01-21 15:01:01,6,30
+LB Nagar,Nizamabad,2026-01-20 13:26:01,6,16
+Siddipet,JBS Secunderabad,2026-01-06 07:36:01,7,17
+Kukatpally,Mehdipatnam,2026-01-19 21:17:01,8,15
+Suryapet,Nalgonda,2026-01-15 16:11:01,9,19
+Dilsukhnagar,Karimnagar,2026-01-16 08:42:01,12,16
+Karimnagar,Mahabubnagar,2026-01-25 03:48:01,8,22
+Karimnagar,Nizamabad,2025-12-27 22:04:01,12,14
+Dilsukhnagar,Gachibowli,2026-01-20 19:18:01,15,23
+Gachibowli,Nalgonda,2026-01-29 06:56:01,13,19
+Nizamabad,Khammam,2026-02-10 18:00:01,3,18
+Uppal,Kukatpally,2026-01-01 15:20:01,14,29
+Gachibowli,JBS Secunderabad,2026-02-04 09:52:01,13,25
+LB Nagar,Gachibowli,2026-02-08 11:56:01,6,13
+Gachibowli,Siddipet,2026-01-04 19:28:01,11,14
+Adilabad,Hyderabad MGBS,2026-01-11 16:07:01,15,20
+JBS Secunderabad,Karimnagar,2026-02-07 09:01:01,9,29
+Siddipet,Medak,2025-12-29 09:55:01,5,16
+Mehdipatnam,Dilsukhnagar,2026-01-30 17:25:01,9,15
+Uppal,Hyderabad MGBS,2025-12-30 19:55:01,4,16
+Ameerpet,Kukatpally,2026-01-13 08:07:01,12,21
+Suryapet,Hitech City,2026-01-20 19:54:01,10,19
+LB Nagar,Dilsukhnagar,2025-12-31 09:07:01,12,17
+Mehdipatnam,Khammam,2026-01-13 22:37:01,6,19
+Hyderabad MGBS,LB Nagar,2026-02-06 18:35:01,3,20
+Hyderabad MGBS,Adilabad,2025-12-26 19:36:01,14,13
+Nalgonda,Kukatpally,2026-01-31 08:12:01,7,22
+JBS Secunderabad,Adilabad,2026-01-10 22:15:01,15,22
+Ameerpet,Nizamabad,2026-01-16 07:06:01,10,13
+Ameerpet,Hyderabad MGBS,2026-01-14 09:32:01,3,12
+Adilabad,Hyderabad MGBS,2026-01-23 21:08:01,14,24
+Siddipet,Uppal,2026-01-13 23:16:01,12,26
+Nalgonda,Hitech City,2026-01-08 09:18:01,7,13
+Gachibowli,LB Nagar,2026-02-06 13:51:01,15,28
+Adilabad,JBS Secunderabad,2026-02-07 17:02:01,6,24
+Nalgonda,Karimnagar,2026-01-18 07:32:01,14,23
+Mahabubnagar,Hitech City,2026-02-09 04:13:01,13,13
+Nalgonda,LB Nagar,2026-01-26 02:22:01,11,15
+Nizamabad,Mahabubnagar,2026-01-22 19:52:01,10,18
+Dilsukhnagar,JBS Secunderabad,2026-01-13 19:25:01,14,30
+Nalgonda,Mahabubnagar,2026-01-23 05:33:01,3,22
+Nizamabad,Nalgonda,2026-01-26 14:06:01,5,25
+Hyderabad MGBS,Nalgonda,2026-01-29 08:58:01,3,29
+Siddipet,Khammam,2026-01-28 00:50:01,8,12
+Suryapet,Nizamabad,2026-02-10 02:34:01,15,14
+Suryapet,JBS Secunderabad,2026-01-05 07:07:01,12,30
+Uppal,LB Nagar,2026-02-03 10:39:01,9,20
+Mahabubnagar,Mehdipatnam,2026-01-04 00:29:01,13,27
+Gachibowli,Nalgonda,2026-01-01 07:46:01,13,18
+Gachibowli,Mahabubnagar,2026-01-30 18:54:01,7,20
+Ameerpet,Khammam,2026-01-24 10:07:01,5,13
+Ameerpet,Mahabubnagar,2025-12-31 21:00:01,4,25
+Siddipet,Hitech City,2026-01-17 12:01:01,11,21
+Hitech City,Hyderabad MGBS,2026-01-15 04:03:01,3,18
+Ameerpet,Karimnagar,2026-02-02 05:49:01,5,13
+Gachibowli,LB Nagar,2026-01-12 01:29:01,7,18
+Ameerpet,Siddipet,2026-01-23 10:32:01,14,27
+Dilsukhnagar,Karimnagar,2026-01-12 02:10:01,15,24
+Mahabubnagar,Warangal,2026-01-15 18:26:01,8,18
+Gachibowli,Suryapet,2026-02-06 23:28:01,4,20
+Mahabubnagar,Medak,2026-01-25 04:29:01,15,28
+Medak,Nalgonda,2026-02-04 17:08:01,8,14
+Khammam,Karimnagar,2026-01-25 10:43:01,4,21
+Nizamabad,JBS Secunderabad,2026-01-12 00:23:01,13,13
+Gachibowli,Hyderabad MGBS,2025-12-29 08:35:01,9,14
+Kukatpally,Medak,2026-01-26 22:37:01,9,23
+Mahabubnagar,Kukatpally,2026-01-30 19:50:01,12,13
+Hitech City,Adilabad,2026-01-28 22:39:01,10,27
+Mahabubnagar,Nalgonda,2026-01-12 18:35:01,11,24
+Karimnagar,Nalgonda,2026-01-26 10:02:01,4,27
+Adilabad,Nizamabad,2026-01-13 17:50:01,9,22
+Mehdipatnam,Nalgonda,2026-02-09 13:03:01,3,16
+Adilabad,Dilsukhnagar,2026-02-05 17:50:01,13,18
+Nizamabad,Uppal,2026-01-25 19:01:01,10,26
+Gachibowli,LB Nagar,2026-02-11 03:01:01,6,19
+Uppal,Mehdipatnam,2026-01-14 20:15:01,4,15
+Warangal,Kukatpally,2026-01-30 04:05:01,15,21
+Hyderabad MGBS,Khammam,2026-02-08 16:37:01,10,18
+Nizamabad,Ameerpet,2026-01-17 14:05:01,14,30
+Ameerpet,Uppal,2026-02-01 10:32:01,15,13
+Hyderabad MGBS,Adilabad,2026-01-21 19:38:01,9,25
+Dilsukhnagar,Medak,2026-02-03 18:50:01,13,13
+LB Nagar,Ameerpet,2026-02-09 11:45:01,15,18
+Siddipet,JBS Secunderabad,2026-01-15 14:43:01,11,19
+Siddipet,JBS Secunderabad,2026-02-06 13:45:01,8,26
+Nizamabad,Mahabubnagar,2026-01-25 00:57:01,11,17
+Hitech City,Nalgonda,2026-02-09 09:45:01,3,24
+Khammam,Siddipet,2025-12-28 17:37:01,11,19
+JBS Secunderabad,Adilabad,2026-02-11 09:59:01,7,26
+Mahabubnagar,Hyderabad MGBS,2026-01-08 12:04:01,10,14
+Medak,Gachibowli,2026-01-01 08:34:01,7,26
+Dilsukhnagar,LB Nagar,2026-01-29 15:10:01,11,22
+Adilabad,Warangal,2026-01-09 20:12:01,15,17
+Mehdipatnam,Dilsukhnagar,2026-02-05 11:37:01,6,30
+Nalgonda,Suryapet,2026-01-22 17:47:01,11,24
+JBS Secunderabad,Warangal,2026-02-06 11:26:01,6,19
+Adilabad,Nalgonda,2025-12-25 22:54:01,4,27
+Hitech City,Medak,2026-01-28 03:50:01,9,19
+Uppal,Nalgonda,2025-12-31 19:37:01,4,12
+Uppal,Adilabad,2026-02-11 12:45:01,5,15
+Karimnagar,Nizamabad,2026-01-08 21:59:01,3,14
+Dilsukhnagar,Gachibowli,2026-01-29 06:55:01,13,30
+Nizamabad,Medak,2026-01-04 05:30:01,3,24
+Hitech City,Dilsukhnagar,2026-01-22 23:38:01,3,26
+JBS Secunderabad,Nizamabad,2026-02-03 04:09:01,14,22
+Medak,Nalgonda,2025-12-25 22:39:01,10,17
+Ameerpet,LB Nagar,2026-02-03 10:00:01,6,27
+Medak,Mehdipatnam,2026-01-02 18:18:01,5,28
+Mahabubnagar,Khammam,2026-01-20 11:52:01,6,18
+Ameerpet,Siddipet,2026-02-10 07:37:01,3,16
+Uppal,Suryapet,2026-02-02 13:35:01,9,12
+Gachibowli,Kukatpally,2026-02-06 01:04:01,10,15
+Suryapet,Khammam,2026-01-26 05:46:01,12,21
+LB Nagar,Hyderabad MGBS,2025-12-31 23:43:01,15,13
+Karimnagar,Dilsukhnagar,2026-01-30 13:09:01,11,21
+Karimnagar,Hitech City,2025-12-27 06:13:01,15,23
+Karimnagar,JBS Secunderabad,2026-01-03 11:24:01,15,21
+Mehdipatnam,Hyderabad MGBS,2026-02-09 18:50:01,12,29
+Adilabad,Uppal,2026-01-17 16:26:01,8,15
+Gachibowli,Hitech City,2026-01-16 14:27:01,4,22
+Nalgonda,Adilabad,2026-01-19 11:55:01,11,14
+Warangal,Ameerpet,2026-01-25 01:37:01,7,12
+Khammam,Warangal,2026-01-25 19:33:01,14,20
+Nalgonda,JBS Secunderabad,2026-01-21 14:39:01,12,28
+Nizamabad,Mahabubnagar,2026-01-04 02:18:01,14,18
+Gachibowli,Kukatpally,2026-02-08 18:42:01,12,12
+Medak,Warangal,2026-01-10 06:51:01,6,25
+Uppal,Adilabad,2026-01-23 05:48:01,6,13
+Hyderabad MGBS,Ameerpet,2026-01-27 23:36:01,14,29
+Mehdipatnam,Hyderabad MGBS,2025-12-31 19:39:01,15,26
+Kukatpally,Mahabubnagar,2026-01-09 14:40:01,14,26
+Khammam,Ameerpet,2026-01-03 18:46:01,9,28
+Hyderabad MGBS,LB Nagar,2026-01-06 21:22:01,7,15
+Khammam,Warangal,2026-01-08 01:05:01,13,27
+Gachibowli,Nizamabad,2026-01-28 18:42:01,3,30
+Kukatpally,Mehdipatnam,2026-01-20 17:23:01,8,14
+LB Nagar,Siddipet,2026-01-30 12:05:01,12,19
+Nalgonda,Hitech City,2026-01-31 01:31:01,8,22
+Warangal,Ameerpet,2026-01-17 20:08:01,6,16
+Suryapet,Adilabad,2026-01-16 15:36:01,5,17
+Adilabad,Medak,2026-01-22 16:43:01,6,12
+Siddipet,Hyderabad MGBS,2026-02-01 20:16:01,12,15
+Nalgonda,Kukatpally,2026-01-04 05:00:01,6,29
+Siddipet,Karimnagar,2026-01-11 11:27:01,12,19
+Mehdipatnam,Siddipet,2026-01-28 03:41:01,12,12
+Hitech City,Dilsukhnagar,2026-01-13 11:30:01,8,13
+Siddipet,Suryapet,2026-01-05 02:38:01,10,25
+Suryapet,JBS Secunderabad,2026-01-31 00:53:01,5,24
+Uppal,Mehdipatnam,2026-01-08 09:14:01,4,27
+Siddipet,Dilsukhnagar,2026-01-30 09:12:01,4,19
+Dilsukhnagar,Gachibowli,2026-01-14 18:21:01,4,19
+JBS Secunderabad,Kukatpally,2026-01-08 08:22:01,11,16
+Ameerpet,JBS Secunderabad,2026-01-21 00:26:01,12,22
+Mehdipatnam,Warangal,2026-01-12 10:48:01,15,14
+Dilsukhnagar,JBS Secunderabad,2026-02-06 20:09:01,13,26
+Karimnagar,Ameerpet,2026-01-29 12:21:01,7,17
+Nalgonda,Warangal,2026-01-27 01:26:01,14,20
+Mehdipatnam,Nalgonda,2026-01-18 21:32:01,11,13
+Adilabad,LB Nagar,2026-01-01 23:06:01,14,22
+Nalgonda,Khammam,2026-02-10 01:30:01,6,22
+Khammam,Hitech City,2026-01-24 20:07:01,7,14
+Mehdipatnam,Gachibowli,2026-01-12 12:46:01,6,30
+Hitech City,Dilsukhnagar,2026-02-04 03:33:01,5,27
+Gachibowli,Ameerpet,2026-02-05 07:35:01,4,15
+Khammam,Mehdipatnam,2026-02-06 16:09:01,8,14
+Ameerpet,Karimnagar,2026-01-15 09:17:01,10,21
+Adilabad,LB Nagar,2026-02-07 01:31:01,8,18
+JBS Secunderabad,Mehdipatnam,2026-01-10 06:02:01,15,23
+Adilabad,Khammam,2026-01-16 18:07:01,13,21
+Uppal,JBS Secunderabad,2026-02-07 15:07:01,9,17
+Kukatpally,Nalgonda,2026-01-10 04:16:01,8,20
+Karimnagar,Warangal,2026-02-06 16:42:01,15,27
+JBS Secunderabad,Karimnagar,2026-02-08 08:13:01,12,14
+Kukatpally,Warangal,2026-01-20 07:23:01,12,12
+Mahabubnagar,Medak,2026-01-08 22:21:01,13,12
+Suryapet,JBS Secunderabad,2026-01-06 11:54:01,10,23
+Ameerpet,Mahabubnagar,2026-01-24 06:44:01,4,21
+Ameerpet,Suryapet,2026-01-26 03:49:01,6,13
+LB Nagar,Mahabubnagar,2026-01-14 13:52:01,5,21
+Ameerpet,Medak,2025-12-29 13:31:01,11,15
+Suryapet,Mehdipatnam,2025-12-30 00:34:01,9,22
+Mehdipatnam,Medak,2026-01-17 05:16:01,7,16

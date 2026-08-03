@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SmartRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">SmartRTC</div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="upload.html">Upload Data</a></li>
+                <li><a href="analytics.html">OD Analytics</a></li>
+                <li><a href="profitability.html">Profitability</a></li>
+                <li><a href="whatif-simulator.html">What-If Simulator</a></li>
+
+                <li><a href="maps.html">Maps</a></li>
+                <li><a href="#" onclick="TSRTC.auth.logout(); return false;">Logout</a></li>
+                <li class="user-info"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div style="margin-bottom: 2rem;">
+            <h1>Control Dashboard</h1>
+            <p style="color: var(--text-secondary);">Real-time transport analytics and insights</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <a href="upload.html" class="btn btn-primary">
+                    📤 Upload New Data
+                </a>
+
+                <a href="whatif-simulator.html" class="btn btn-secondary">
+                    📊 What-If Simulator
+                </a>
+                <a href="admin-complaints.html" class="btn btn-secondary">📋 Complaints</a>
+                <button class="btn btn-secondary" onclick="refreshDashboard()">
+                    🔄 Refresh Data
+                </button>
+            </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-4" style="margin-bottom: 2rem;">
+            <div class="metric-card stagger-1">
+                <div class="metric-label">Total Passengers</div>
+                <div class="metric-value" id="totalPassengers">0</div>
+                <div class="metric-change positive">
+                    ▲ 12.5% from last period
+                </div>
+            </div>
+
+            <div class="metric-card stagger-2">
+                <div class="metric-label">Total Revenue</div>
+                <div class="metric-value" id="totalRevenue">₹0</div>
+                <div class="metric-change positive">
+                    ▲ 8.3% from last period
+                </div>
+            </div>
+
+            <div class="metric-card stagger-3">
+                <div class="metric-label">Active Routes</div>
+                <div class="metric-value" id="activeRoutes">0</div>
+                <div class="metric-change positive">
+                    ▲ 5 new routes
+                </div>
+            </div>
+
+            <div class="metric-card stagger-4">
+                <div class="metric-label">Avg Fare</div>
+                <div class="metric-value" id="avgFare">₹0</div>
+                <div class="metric-change negative">
+                    ▼ 2.1% from last period
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-2" style="margin-bottom: 2rem;">
+            <div class="glass-card">
+                <h3>Hourly Passenger Demand</h3>
+                <div class="chart-container">
+                    <canvas id="hourlyDemandChart"></canvas>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h3>Top Revenue Corridors</h3>
+                <div class="chart-container">
+                    <canvas id="topCorridorsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="glass-card">
+            <h3 style="margin-bottom: 1.5rem;">System Status</h3>
+            <div id="systemStatus" class="grid grid-3">
+                <div style="text-align: center; padding: 1rem;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">✓</div>
+                    <div style="color: var(--accent-green); font-weight: 600;">Data Loaded</div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">
+                        Ready for analysis
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 1rem;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+                    <div style="color: var(--accent-cyan); font-weight: 600;">Analytics Active</div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">
+                        All modules operational
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 1rem;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔄</div>
+                    <div style="color: var(--accent-blue); font-weight: 600;">Live Updates</div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.25rem;">
+                        Real-time processing
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        TSRTC.requireAuth();
+
+        async function loadDashboardData() {
+            try {
+                // Show loading state
+                document.getElementById('totalPassengers').textContent = '...';
+                document.getElementById('totalRevenue').textContent = '...';
+                document.getElementById('activeRoutes').textContent = '...';
+                document.getElementById('avgFare').textContent = '...';
+
+                // Fetch OD matrix data
+                const data = await TSRTC.api.getODMatrix();
+
+                // Animate metric values
+                const passengersEl = document.getElementById('totalPassengers');
+                const revenueEl = document.getElementById('totalRevenue');
+                const routesEl = document.getElementById('activeRoutes');
+                const fareEl = document.getElementById('avgFare');
+
+                passengersEl.textContent = TSRTC.formatNumber(data.summary.total_passengers);
+                revenueEl.textContent = TSRTC.formatCurrency(data.summary.total_revenue);
+                routesEl.textContent = data.summary.unique_corridors;
+                fareEl.textContent = TSRTC.formatCurrency(data.summary.avg_fare);
+
+                // Create hourly demand chart
+                const hourlyLabels = data.hourly_demand.map(d => `${d.hour}:00`);
+                const hourlyData = data.hourly_demand.map(d => d.passenger_count);
+
+                TSRTC.chartManager.createLineChart('hourlyDemandChart', hourlyLabels, [{
+                    label: 'Passengers',
+                    data: hourlyData,
+                    borderColor: '#00d4ff',
+                    backgroundColor: 'rgba(0, 212, 255, 0.1)'
+                }]);
+
+                // Create top corridors chart
+                const topCorridors = data.top_corridors.slice(0, 8);
+                const corridorLabels = topCorridors.map(c => `${c.from_stop} → ${c.to_stop}`.substring(0, 20));
+                const corridorData = topCorridors.map(c => c.fare);
+
+                TSRTC.chartManager.createBarChart(
+                    'topCorridorsChart',
+                    corridorLabels,
+                    corridorData,
+                    'Revenue',
+                    '#00ffcc'
+                );
+
+                TSRTC.notify.success('Dashboard loaded successfully');
+
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+
+                // Show error state
+                document.getElementById('systemStatus').innerHTML = `
+                    <div style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+                        <h3 style="color: var(--accent-red); margin-bottom: 0.5rem;">No Data Available</h3>
+                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                            Please upload ticket data to begin analysis
+                        </p>
+                        <a href="upload.html" class="btn btn-primary">
+                            Upload Data Now
+                        </a>
+                    </div>
+                `;
+
+                TSRTC.notify.error('Please upload data to view dashboard');
+            }
+        }
+
+        function refreshDashboard() {
+            TSRTC.notify.info('Refreshing dashboard...');
+            loadDashboardData();
+        }
+
+        // Load data on page load
+        window.addEventListener('load', loadDashboardData);
+    </script>
+</body>
+
+</html>

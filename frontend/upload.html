@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Data - SmartRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">SmartRTC</div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="upload.html">Upload Data</a></li>
+                <li><a href="analytics.html">OD Analytics</a></li>
+                <li><a href="profitability.html">Profitability</a></li>
+                <li><a href="whatif-simulator.html">What-If Simulator</a></li>
+
+                <li><a href="maps.html">Maps</a></li>
+                <li><a href="#" onclick="TSRTC.auth.logout(); return false;">Logout</a></li>
+                <li class="user-info"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div style="margin-bottom: 2rem;">
+            <h1>Data Upload & Validation</h1>
+            <p style="color: var(--text-secondary);">Upload ticket data CSV for analysis</p>
+        </div>
+
+        <!-- Requirements Card -->
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Required CSV Format</h3>
+            <div class="grid grid-2">
+                <div>
+                    <h4 style="color: var(--accent-cyan); margin-bottom: 0.75rem;">Required Columns</h4>
+                    <ul style="color: var(--text-secondary); line-height: 1.8;">
+                        <li><code>from_stop</code> - Origin stop name</li>
+                        <li><code>to_stop</code> - Destination stop name</li>
+                        <li><code>time</code> - Journey timestamp</li>
+                        <li><code>passenger_count</code> - Number of passengers</li>
+                        <li><code>fare</code> - Ticket fare amount</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: var(--accent-cyan); margin-bottom: 0.75rem;">Data Requirements</h4>
+                    <ul style="color: var(--text-secondary); line-height: 1.8;">
+                        <li>CSV format only (.csv)</li>
+                        <li>Headers must match exactly</li>
+                        <li>No missing values in required fields</li>
+                        <li>Valid timestamps (YYYY-MM-DD HH:MM:SS)</li>
+                        <li>Positive numeric values for fare and passengers</li>
+                    </ul>
+                </div>
+            </div>
+            <div style="margin-top: 1.5rem;">
+                <button class="btn btn-secondary" onclick="TSRTC.api.downloadSample()">
+                    📥 Download Sample CSV
+                </button>
+            </div>
+        </div>
+
+        <!-- Upload Zone -->
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1.5rem;">Upload Ticket Data</h3>
+
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">📁</div>
+                <h3 style="margin-bottom: 0.5rem;">Drag & Drop CSV File Here</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    or click to browse
+                </p>
+                <input type="file" id="fileInput" accept=".csv" style="display: none;">
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                    Browse Files
+                </button>
+            </div>
+
+            <!-- Progress Bar -->
+            <div id="uploadProgress" class="hidden" style="margin-top: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-weight: 600;">Uploading...</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Validation Results -->
+        <div id="validationResults" class="hidden">
+            <div class="glass-card" style="margin-bottom: 2rem;">
+                <h3 style="margin-bottom: 1.5rem;">Validation Results</h3>
+
+                <div id="validationSummary" class="grid grid-4" style="margin-bottom: 2rem;">
+                    <!-- Will be populated dynamically -->
+                </div>
+
+                <div id="issuesContainer" class="hidden" style="margin-bottom: 2rem;">
+                    <h4 style="color: var(--accent-red); margin-bottom: 1rem;">⚠️ Data Quality Issues</h4>
+                    <div id="issuesList"></div>
+                </div>
+
+                <div id="previewContainer">
+                    <h4 style="margin-bottom: 1rem;">Data Preview (First 10 Rows)</h4>
+                    <div style="overflow-x: auto;">
+                        <table class="data-table" id="previewTable">
+                            <!-- Will be populated dynamically -->
+                        </table>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                    <button class="btn btn-primary" onclick="window.location.href='analytics.html'">
+                        Continue to Analytics →
+                    </button>
+                    <button class="btn btn-secondary" onclick="location.reload()">
+                        Upload New File
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        TSRTC.requireAuth();
+
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+
+        // Drag and drop handlers
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('drag-over');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileUpload(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileUpload(e.target.files[0]);
+            }
+        });
+
+        async function handleFileUpload(file) {
+            if (!file.name.endsWith('.csv')) {
+                TSRTC.notify.error('Please upload a CSV file');
+                return;
+            }
+
+            // Show progress
+            document.getElementById('uploadProgress').classList.remove('hidden');
+            simulateProgress();
+
+            try {
+                const result = await TSRTC.api.uploadData(file);
+
+                // Hide progress
+                document.getElementById('uploadProgress').classList.add('hidden');
+
+                // Show validation results
+                displayValidationResults(result);
+
+                TSRTC.notify.success('File uploaded successfully!');
+
+            } catch (error) {
+                document.getElementById('uploadProgress').classList.add('hidden');
+                TSRTC.notify.error(error.message || 'Upload failed');
+            }
+        }
+
+        function simulateProgress() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 30;
+                if (progress > 95) progress = 95;
+
+                document.getElementById('progressFill').style.width = progress + '%';
+                document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
+
+                if (progress >= 95) {
+                    clearInterval(interval);
+                }
+            }, 200);
+        }
+
+        function displayValidationResults(result) {
+            const validation = result.validation;
+            const stats = result.stats;
+
+            // Show results container
+            document.getElementById('validationResults').classList.remove('hidden');
+
+            // Summary metrics
+            const summaryHTML = `
+                <div class="metric-card">
+                    <div class="metric-label">Total Records</div>
+                    <div class="metric-value">${TSRTC.formatNumber(validation.total_records)}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Quality Score</div>
+                    <div class="metric-value">${validation.quality_score}%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Unique Stops</div>
+                    <div class="metric-value">${stats.unique_stops}</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Issues Found</div>
+                    <div class="metric-value">${validation.issues.length}</div>
+                </div>
+            `;
+            document.getElementById('validationSummary').innerHTML = summaryHTML;
+
+            // Issues
+            if (validation.issues.length > 0) {
+                document.getElementById('issuesContainer').classList.remove('hidden');
+                const issuesHTML = validation.issues.map(issue => `
+                    <div style="background: rgba(255, 71, 87, 0.1); border-left: 3px solid var(--accent-red); padding: 1rem; border-radius: 8px; margin-bottom: 0.75rem;">
+                        <div style="font-weight: 600; margin-bottom: 0.25rem;">
+                            ${issue.type.replace('_', ' ').toUpperCase()}
+                        </div>
+                        <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                            ${issue.column ? `Column: ${issue.column} - ` : ''}
+                            ${issue.message || `${issue.count} occurrences (${issue.percentage}%)`}
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('issuesList').innerHTML = issuesHTML;
+            }
+
+            // Preview table
+            if (validation.preview && validation.preview.length > 0) {
+                const headers = Object.keys(validation.preview[0]);
+                const tableHTML = `
+                    <thead>
+                        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${validation.preview.map(row => `
+                            <tr>${headers.map(h => `<td>${row[h] || '-'}</td>`).join('')}</tr>
+                        `).join('')}
+                    </tbody>
+                `;
+                document.getElementById('previewTable').innerHTML = tableHTML;
+            }
+        }
+    </script>
+</body>
+
+</html>

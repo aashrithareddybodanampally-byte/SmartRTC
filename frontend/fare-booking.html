@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Ticket - Fare Based | SmartRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        .fare-input-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .payment-option {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-option:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .payment-option.selected {
+            border-color: var(--accent-cyan);
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(147, 51, 234, 0.1));
+        }
+
+        .payment-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .fare-calculator {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 1.5rem 0;
+        }
+
+        .distance-display {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ticket-display {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            text-align: center;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .qr-code-canvas {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1.5rem auto;
+            display: inline-block;
+        }
+
+        .ticket-info {
+            margin-top: 1.5rem;
+            text-align: left;
+        }
+
+        .ticket-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .ticket-label {
+            color: var(--text-secondary);
+        }
+
+        .ticket-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .btn-download {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: #fff;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--accent-cyan);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">SmartRTC</div>
+            <ul class="nav-links">
+                <li><a href="landing.html">Home</a></li>
+                <li><a href="fare-booking.html" class="active">Book Ticket</a></li>
+                <li><a href="qr-scanner.html">Scan QR</a></li>
+                <li><a href="users.html">Track</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="margin-bottom: 2rem;">
+            <h1>✨ Fare-Based Ticket Booking</h1>
+            <p style="color: var(--text-secondary);">Enter your fare amount • Travel on any bus • Valid for calculated
+                distance</p>
+        </div>
+
+        <!-- Booking Form -->
+        <div id="bookingForm" class="fare-input-section">
+            <h2>Enter Travel Details</h2>
+
+            <div class="form-group">
+                <label>Fare Amount (₹)</label>
+                <input type="number" id="fareAmount" min="50" max="500" step="10" value="100"
+                    placeholder="Enter fare amount (₹50 - ₹500)">
+            </div>
+
+            <div class="fare-calculator" id="fareCalculator">
+                ₹100 = 50 km
+            </div>
+
+            <div class="distance-display">
+                <span>💡 Valid on any bus for calculated distance</span>
+            </div>
+
+            <div class="form-group">
+                <label>Passenger Name</label>
+                <input type="text" id="passengerName" placeholder="Enter full name">
+            </div>
+
+            <div class="form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="passengerPhone" placeholder="Enter 10-digit phone number" maxlength="10">
+            </div>
+
+            <div class="form-group">
+                <label>Email (Optional)</label>
+                <input type="email" id="passengerEmail" placeholder="Enter email address">
+            </div>
+
+            <div class="form-group">
+                <label>Travel Date</label>
+                <input type="date" id="travelDate">
+            </div>
+
+            <h3 style="margin-top: 2rem;">Select Payment Method</h3>
+            <div class="payment-methods">
+                <div class="payment-option" data-payment="upi">
+                    <div class="payment-icon">📱</div>
+                    <div>UPI</div>
+                </div>
+                <div class="payment-option" data-payment="card">
+                    <div class="payment-icon">💳</div>
+                    <div>Card</div>
+                </div>
+                <div class="payment-option" data-payment="netbanking">
+                    <div class="payment-icon">🏦</div>
+                    <div>Net Banking</div>
+                </div>
+                <div class="payment-option" data-payment="wallet_paytm">
+                    <div class="payment-icon">👛</div>
+                    <div>Paytm</div>
+                </div>
+                <div class="payment-option" data-payment="wallet_phonepe">
+                    <div class="payment-icon">📲</div>
+                    <div>PhonePe</div>
+                </div>
+                <div class="payment-option" data-payment="wallet_googlepay">
+                    <div class="payment-icon">💰</div>
+                    <div>GooglePay</div>
+                </div>
+            </div>
+
+            <button onclick="processBooking()" class="btn btn-primary" style="margin-top: 2rem; width: 100%;">
+                Book Now & Pay
+            </button>
+        </div>
+
+        <!-- Ticket Display (Hidden initially) -->
+        <div id="ticketDisplay" class="ticket-display" style="display: none;">
+            <h2>🎉 Booking Successful!</h2>
+
+            <div id="qrCode" class="qr-code-canvas"></div>
+
+            <div class="ticket-info">
+                <div class="ticket-row">
+                    <span class="ticket-label">Ticket ID:</span>
+                    <span class="ticket-value" id="ticketId">-</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Passenger:</span>
+                    <span class="ticket-value" id="ticketName">-</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Fare Paid:</span>
+                    <span class="ticket-value" id="ticketFare">-</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Travel Distance:</span>
+                    <span class="ticket-value" id="ticketDistance">-</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Valid Until:</span>
+                    <span class="ticket-value" id="ticketExpiry">-</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Payment:</span>
+                    <span class="ticket-value" id="ticketPayment">-</span>
+                </div>
+            </div>
+
+            <button onclick="downloadTicket()" class="btn-download">
+                📥 Download Ticket
+            </button>
+
+            <button onclick="bookAnother()" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">
+                Book Another Ticket
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let selectedPayment = null;
+        let currentTicket = null;
+
+        // Set today as minimum date
+        document.getElementById('travelDate').min = new Date().toISOString().split('T')[0];
+        document.getElementById('travelDate').value = new Date().toISOString().split('T')[0];
+
+        // Fare calculator
+        document.getElementById('fareAmount').addEventListener('input', function () {
+            const fare = parseFloat(this.value) || 0;
+            const distance = (fare / 2).toFixed(2);
+            document.getElementById('fareCalculator').textContent = `₹${fare} = ${distance} km`;
+        });
+
+        // Payment method selection
+        document.querySelectorAll('.payment-option').forEach(option => {
+            option.addEventListener('click', function () {
+                document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPayment = this.getAttribute('data-payment');
+            });
+        });
+
+        async function processBooking() {
+            // Validate inputs
+            const fareAmount = parseFloat(document.getElementById('fareAmount').value);
+            const passengerName = document.getElementById('passengerName').value.trim();
+            const passengerPhone = document.getElementById('passengerPhone').value.trim();
+            const passengerEmail = document.getElementById('passengerEmail').value.trim();
+            const travelDate = document.getElementById('travelDate').value;
+
+            if (!fareAmount || fareAmount < 50 || fareAmount > 500) {
+                alert('Please enter a valid fare amount between ₹50 and ₹500');
+                return;
+            }
+
+            if (!passengerName) {
+                alert('Please enter passenger name');
+                return;
+            }
+
+            if (!passengerPhone || passengerPhone.length !== 10) {
+                alert('Please enter a valid 10-digit phone number');
+                return;
+            }
+
+            if (!travelDate) {
+                alert('Please select travel date');
+                return;
+            }
+
+            if (!selectedPayment) {
+                alert('Please select a payment method');
+                return;
+            }
+
+            // Show loading
+            const btn = event.target;
+            btn.textContent = '🔄 Processing Payment...';
+            btn.disabled = true;
+
+            try {
+                // Simulate payment gateway (demo)
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Create booking
+                const response = await fetch('http://localhost:8000/api/bookings/fare-based', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fare_amount: fareAmount,
+                        passenger_name: passengerName,
+                        passenger_phone: passengerPhone,
+                        passenger_email: passengerEmail || null,
+                        travel_date: travelDate,
+                        payment_method: selectedPayment
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentTicket = data;
+                    displayTicket(data);
+                } else {
+                    alert('Booking failed: ' + (data.detail || 'Unknown error'));
+                    btn.textContent = 'Book Now & Pay';
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Booking error:', error);
+                alert('Failed to process booking. Please ensure the backend server is running.');
+                btn.textContent = 'Book Now & Pay';
+                btn.disabled = false;
+            }
+        }
+
+        function displayTicket(data) {
+            // Hide form, show ticket
+            document.getElementById('bookingForm').style.display = 'none';
+            document.getElementById('ticketDisplay').style.display = 'block';
+
+            // Generate QR code
+            const qrData = JSON.stringify(data.qr_data);
+            document.getElementById('qrCode').innerHTML = '';
+            QRCode.toCanvas(document.getElementById('qrCode'), qrData, {
+                width: 200,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            });
+
+            // Fill ticket details
+            document.getElementById('ticketId').textContent = data.ticket_id;
+            document.getElementById('ticketName').textContent = data.qr_data.passenger;
+            document.getElementById('ticketFare').textContent = `₹${data.fare_amount}`;
+            document.getElementById('ticketDistance').textContent = `${data.distance_km} km`;
+            document.getElementById('ticketExpiry').textContent = new Date(data.valid_until).toLocaleString();
+            document.getElementById('ticketPayment').textContent = selectedPayment.toUpperCase().replace('_', ' ');
+
+            // Scroll to ticket
+            document.getElementById('ticketDisplay').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function downloadTicket() {
+            // Create downloadable image
+            const canvas = document.getElementById('qrCode').querySelector('canvas');
+            const link = document.createElement('a');
+            link.download = `ticket_${currentTicket.ticket_id}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        function bookAnother() {
+            document.getElementById('bookingForm').style.display = 'block';
+            document.getElementById('ticketDisplay').style.display = 'none';
+
+            // Reset form
+            document.getElementById('passengerName').value = '';
+            document.getElementById('passengerEmail').value = '';
+            document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+            selectedPayment = null;
+
+            document.querySelector('.btn-primary').textContent = 'Book Now & Pay';
+            document.querySelector('.btn-primary').disabled = false;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>

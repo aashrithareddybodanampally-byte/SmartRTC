@@ -1,0 +1,31 @@
+route_id,from_stop,to_stop,passenger_count,fare,distance_km,trip_date,time
+R001,JNTU,Ameerpet,45,25,8,2024-01-15,08:30
+R001,JNTU,Ameerpet,48,25,8,2024-01-15,09:00
+R001,JNTU,Ameerpet,52,25,8,2024-01-15,17:30
+R001,JNTU,Ameerpet,50,25,8,2024-01-16,08:30
+R001,JNTU,Ameerpet,46,25,8,2024-01-16,09:00
+R002,Secunderabad,Kukatpally,38,30,12,2024-01-15,07:00
+R002,Secunderabad,Kukatpally,42,30,12,2024-01-15,08:00
+R002,Secunderabad,Kukatpally,35,30,12,2024-01-15,18:00
+R002,Secunderabad,Kukatpally,40,30,12,2024-01-16,07:00
+R002,Secunderabad,Kukatpally,39,30,12,2024-01-16,08:00
+R003,Dilsukhnagar,Uppal,28,20,10,2024-01-15,09:30
+R003,Dilsukhnagar,Uppal,30,20,10,2024-01-15,10:00
+R003,Dilsukhnagar,Uppal,25,20,10,2024-01-15,18:30
+R003,Dilsukhnagar,Uppal,27,20,10,2024-01-16,09:30
+R003,Dilsukhnagar,Uppal,29,20,10,2024-01-16,10:00
+R004,Miyapur,Begumpet,55,35,15,2024-01-15,06:30
+R004,Miyapur,Begumpet,58,35,15,2024-01-15,07:00
+R004,Miyapur,Begumpet,60,35,15,2024-01-15,17:00
+R004,Miyapur,Begumpet,57,35,15,2024-01-16,06:30
+R004,Miyapur,Begumpet,59,35,15,2024-01-16,07:00
+R005,LB Nagar,Charminar,22,18,9,2024-01-15,10:00
+R005,LB Nagar,Charminar,20,18,9,2024-01-15,11:00
+R005,LB Nagar,Charminar,18,18,9,2024-01-15,19:00
+R005,LB Nagar,Charminar,21,18,9,2024-01-16,10:00
+R005,LB Nagar,Charminar,19,18,9,2024-01-16,11:00
+R006,Gachibowli,Hi-Tech City,65,40,6,2024-01-15,08:00
+R006,Gachibowli,Hi-Tech City,70,40,6,2024-01-15,08:30
+R006,Gachibowli,Hi-Tech City,68,40,6,2024-01-15,18:00
+R006,Gachibowli,Hi-Tech City,66,40,6,2024-01-16,08:00
+R006,Gachibowli,Hi-Tech City,72,40,6,2024-01-16,08:30

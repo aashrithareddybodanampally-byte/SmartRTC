@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Dashboard - SmartRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        .driver-nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+        }
+
+        .nav-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .profile-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--gradient-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .profile-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .profile-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .profile-role {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .notification-badge {
+            position: relative;
+        }
+
+        .notification-badge::after {
+            content: attr(data-count);
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--accent-red);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .instruction-card {
+            background: var(--glass-bg);
+            border-left: 4px solid var(--accent-cyan);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .instruction-card:hover {
+            background: rgba(0, 212, 255, 0.05);
+            transform: translateX(5px);
+        }
+
+        .instruction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .instruction-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .instruction-time {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .instruction-priority {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--accent-red);
+        }
+
+        .priority-medium {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .priority-low {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--accent-green);
+        }
+
+        .load-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .load-low {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--accent-green);
+        }
+
+        .load-mid {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .load-high {
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--accent-red);
+        }
+
+        .stop-timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .stop-item {
+            position: relative;
+            padding: 1rem 0;
+            border-left: 2px solid var(--glass-border);
+            padding-left: 2rem;
+            margin-left: 1rem;
+        }
+
+        .stop-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 1.5rem;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+        }
+
+        .stop-item:first-child::before {
+            background: var(--accent-green);
+            width: 14px;
+            height: 14px;
+            left: -8px;
+        }
+
+        .stop-item:last-child::before {
+            background: var(--accent-red);
+            width: 14px;
+            height: 14px;
+            left: -8px;
+        }
+
+        .quick-action-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--accent-cyan);
+        }
+
+        .quick-action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="driver-nav">
+        <div class="nav-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span style="font-size: 2rem;">🚍</span>
+                <div>
+                    <div class="logo">SmartRTC Driver Portal</div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary);" id="busInfo">
+                        Loading...
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 2rem;">
+                <button class="notification-badge" data-count="3"
+                    style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-primary);"
+                    onclick="toggleNotifications()">
+                    🔔
+                </button>
+
+                <div class="user-profile">
+                    <div class="profile-avatar" id="profileAvatar">👤</div>
+                    <div class="profile-info">
+                        <div class="profile-name" id="profileName">Loading...</div>
+                        <div class="profile-role" id="profileRole">Loading...</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-secondary" onclick="logout()">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container" style="margin-top: 100px;">
+
+        <!-- Welcome Banner -->
+        <div class="glass-card"
+            style="background: var(--gradient-accent); color: var(--primary-bg); margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="color: var(--primary-bg); margin-bottom: 0.5rem;">
+                        Welcome back, <span id="welcomeName">Driver</span>!
+                    </h2>
+                    <p style="opacity: 0.9;">
+                        Today's shift starts at <strong id="shiftTime">08:00 AM</strong>
+                    </p>
+                </div>
+                <div style="font-size: 4rem;">
+                    👋
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-4" style="margin-bottom: 2rem;">
+            <div class="quick-action-btn" onclick="markArrival()">
+                <div class="quick-action-icon">📍</div>
+                <div style="font-weight: 600;">Mark Arrival</div>
+            </div>
+            <div class="quick-action-btn" onclick="viewSchedule()">
+                <div class="quick-action-icon">📅</div>
+                <div style="font-weight: 600;">My Schedule</div>
+            </div>
+            <div class="quick-action-btn" onclick="contactControl()">
+                <div class="quick-action-icon">📞</div>
+                <div style="font-weight: 600;">Control Room</div>
+            </div>
+        </div>
+
+        <!-- Admin Instructions (traffic/route updates) -->
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1.5rem;">📢 Admin Instructions & Updates</h2>
+            <div id="instructionsList"></div>
+        </div>
+
+        <!-- Today Schedule & Stop Sequence -->
+        <div class="grid grid-2" style="margin-bottom: 2rem;">
+            <!-- Today Schedule (from API) -->
+            <div class="glass-card">
+                <h3 style="margin-bottom: 1rem;">📅 Today's Schedule</h3>
+                <div id="scheduleList">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+
+            <!-- Stop Sequence with Passenger Load -->
+            <div class="glass-card">
+                <h3 style="margin-bottom: 1rem;">🚏 Stop Sequence & Passenger Load</h3>
+                <div class="stop-timeline" id="stopTimeline">
+                    <!-- Will be populated by API -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Traffic Alerts -->
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem;">⚠️ Traffic & Operational Alerts</h3>
+            <div id="alertsList"></div>
+        </div>
+
+        <!-- Incident Reporting -->
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem;">📋 Report Incident</h3>
+            <form id="incidentForm" style="display: grid; gap: 1rem; max-width: 500px;">
+                <div class="form-group">
+                    <label class="form-label">Incident Type</label>
+                    <select class="form-select" id="incidentType" required>
+                        <option value="accident">Accident</option>
+                        <option value="breakdown">Breakdown</option>
+                        <option value="road_block">Road Block</option>
+                        <option value="passenger_issue">Passenger Issue</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" class="form-input" id="incidentLocation" placeholder="e.g. Ameerpet Junction"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input" id="incidentDescription" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Incident Report</button>
+            </form>
+        </div>
+
+        <!-- Route summary (from stops API) -->
+        <div class="glass-card">
+            <h3 style="margin-bottom: 1.5rem;">📋 Route Summary</h3>
+            <div class="grid grid-3" id="routeSummary">
+                <div>
+                    <div style="color: var(--text-muted);">Total Stops</div>
+                    <div style="font-size: 1.5rem; font-weight: 700; color: var(--accent-cyan);" id="totalStops">--
+                    </div>
+                </div>
+                <div>
+                    <div style="color: var(--text-muted);">First Stop</div>
+                    <div style="font-size: 1rem; font-weight: 600;" id="firstStop">--</div>
+                </div>
+                <div>
+                    <div style="color: var(--text-muted);">Last Stop</div>
+                    <div style="font-size: 1rem; font-weight: 600;" id="lastStop">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Check authentication
+        const session = JSON.parse(localStorage.getItem('driver_session') || 'null');
+        if (!session) {
+            window.location.href = 'driver-login.html';
+        }
+
+        // Admin Instructions Data
+        const instructions = [
+            {
+                id: 1,
+                title: 'Route 100: Temporary Diversion',
+                description: 'Due to road construction at Punjagutta, take the alternate route via Panjagutta Circle. Expected duration: 3 days.',
+                priority: 'high',
+                time: '2 hours ago',
+                type: 'route_change'
+            },
+            {
+                id: 2,
+                title: 'Route Merge Notification',
+                description: 'Routes 100 and 102 will be merged during off-peak hours (11 AM - 4 PM) starting tomorrow. New combined route map attached.',
+                priority: 'medium',
+                time: '5 hours ago',
+                type: 'merge'
+            },
+            {
+                id: 3,
+                title: 'New Stop Addition',
+                description: 'New bus stop added at SR Nagar (between Ameerpet and Erragadda). Update your route accordingly.',
+                priority: 'medium',
+                time: '1 day ago',
+                type: 'stop_update'
+            },
+            {
+                id: 4,
+                title: 'Maintenance Schedule',
+                description: 'Your bus is scheduled for routine maintenance on 15th Feb. A replacement bus will be assigned.',
+                priority: 'low',
+                time: '2 days ago',
+                type: 'maintenance'
+            }
+        ];
+
+        const API_BASE = window.TSRTC ? (window.TSRTC.api && window.TSRTC.api.baseUrl) ? TSRTC.api.baseUrl : 'http://localhost:8000' : 'http://localhost:8000';
+
+        async function loadSchedule() {
+            const container = document.getElementById('scheduleList');
+            try {
+                const res = await fetch(`${API_BASE}/api/driver/schedule/${session.employeeId || session.employee_id || 'D001'}`);
+                const data = await res.json();
+                if (data.schedule && data.schedule.length) {
+                    container.innerHTML = data.schedule.map(s => `
+                        <div class="instruction-card" style="margin-bottom: 0.75rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong>Trip ${s.trip_number}</strong> ${s.departure_time} – ${s.route}
+                                    ${s.expected_load ? `<span class="load-badge load-mid">${s.expected_load} load</span>` : ''}
+                                </div>
+                                <span class="instruction-priority priority-${s.status === 'completed' ? 'low' : 'medium'}">${s.status}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p style="color: var(--text-muted);">No schedule for today.</p>';
+                }
+            } catch (e) {
+                container.innerHTML = '<p style="color: var(--text-muted);">Schedule unavailable. Use demo data.</p>';
+                container.innerHTML += instructions.map(inst => `
+                    <div class="instruction-card"><div class="instruction-title">${inst.title}</div><div style="color: var(--text-secondary);">${inst.description}</div></div>
+                `).join('');
+            }
+        }
+
+        async function loadStops() {
+            const container = document.getElementById('stopTimeline');
+            try {
+                const res = await fetch(`${API_BASE}/api/driver/stops/${session.busNo}`);
+                const data = await res.json();
+                if (data.stops && data.stops.length) {
+                    document.getElementById('totalStops').textContent = data.total_stops || data.stops.length;
+                    document.getElementById('firstStop').textContent = data.stops[0]?.name || '--';
+                    document.getElementById('lastStop').textContent = data.stops[data.stops.length - 1]?.name || '--';
+                    container.innerHTML = data.stops.map((stop, i) => {
+                        const loadClass = (stop.load || '50%').includes('9') ? 'load-high' : (stop.load || '50%').includes('7') || (stop.load || '50%').includes('8') ? 'load-mid' : 'load-low';
+                        return `
+                            <div class="stop-item">
+                                <div style="font-weight: 600; margin-bottom: 0.25rem;">${stop.name}</div>
+                                <div style="color: var(--text-muted); font-size: 0.9rem;">${stop.arrival || ''}</div>
+                                <span class="load-badge ${loadClass}">${stop.load || '—'} load</span>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    container.innerHTML = '<p style="color: var(--text-muted);">Stops not available.</p>';
+                }
+            } catch (e) {
+                document.getElementById('totalStops').textContent = '9';
+                document.getElementById('firstStop').textContent = 'Secunderabad';
+                document.getElementById('lastStop').textContent = 'Koti';
+                container.innerHTML = [
+                    { name: 'Secunderabad', arrival: '06:00', load: '90%' },
+                    { name: 'Paradise', arrival: '06:08', load: '95%' },
+                    { name: 'Ameerpet', arrival: '06:30', load: '85%' },
+                    { name: 'Koti', arrival: '07:00', load: '0%' }
+                ].map(s => `<div class="stop-item"><div style="font-weight: 600;">${s.name}</div><div style="color: var(--text-muted); font-size: 0.9rem;">${s.arrival}</div><span class="load-badge load-mid">${s.load} load</span></div>`).join('');
+            }
+        }
+
+        async function loadAlerts() {
+            const container = document.getElementById('alertsList');
+            try {
+                const res = await fetch(`${API_BASE}/api/driver/alerts`);
+                const data = await res.json();
+                if (data.alerts && data.alerts.length) {
+                    container.innerHTML = data.alerts.map(a => `
+                        <div class="instruction-card">
+                            <span class="instruction-priority priority-${a.severity}">${a.severity}</span>
+                            <div class="instruction-title">${a.location}</div>
+                            <div style="color: var(--text-secondary);">${a.message}</div>
+                            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">${a.time || ''}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = '<p style="color: var(--text-muted);">No active alerts.</p>';
+                }
+            } catch (e) {
+                container.innerHTML = '<p style="color: var(--text-muted);">Alerts unavailable.</p>';
+            }
+        }
+
+        function displayInstructions() {
+            const container = document.getElementById('instructionsList');
+            container.innerHTML = instructions.map(inst => `
+                <div class="instruction-card">
+                    <div class="instruction-header">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+                                <div class="instruction-title">${inst.title}</div>
+                                <span class="instruction-priority priority-${inst.priority}">${inst.priority}</span>
+                            </div>
+                            <div class="instruction-time">📅 ${inst.time}</div>
+                        </div>
+                    </div>
+                    <div style="color: var(--text-secondary); line-height: 1.6;">${inst.description}</div>
+                    <button class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem; margin-top: 1rem;" onclick="acknowledgeInstruction(${inst.id})">✓ Acknowledge</button>
+                </div>
+            `).join('');
+        }
+
+        // Initialize page
+        async function initPage() {
+            document.getElementById('profileName').textContent = session.name;
+            document.getElementById('profileRole').textContent = (session.role || 'driver').charAt(0).toUpperCase() + (session.role || 'driver').slice(1);
+            document.getElementById('profileAvatar').textContent = (session.role || 'driver') === 'driver' ? '🚗' : '🎫';
+            document.getElementById('busInfo').textContent = 'Bus No. ' + (session.busNo || '100');
+            document.getElementById('welcomeName').textContent = session.name ? session.name.split(' ')[0] : 'Driver';
+            displayInstructions();
+            await loadSchedule();
+            await loadStops();
+            await loadAlerts();
+        }
+
+        document.getElementById('incidentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const type = document.getElementById('incidentType').value;
+            const location = document.getElementById('incidentLocation').value;
+            const description = document.getElementById('incidentDescription').value;
+            try {
+                const res = await fetch(`${API_BASE}/api/driver/incident?employee_id=${encodeURIComponent(session.employeeId || 'D001')}&bus_number=${encodeURIComponent(session.busNo || '100')}&incident_type=${encodeURIComponent(type)}&description=${encodeURIComponent(description)}&location=${encodeURIComponent(location)}`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('Incident reported. Reference: ' + data.incident_id, 'success');
+                    e.target.reset();
+                } else throw new Error(data.detail || 'Failed');
+            } catch (err) {
+                showToast('Failed to submit incident', 'error');
+            }
+        });
+
+        function acknowledgeInstruction(id) {
+            showToast('Instruction acknowledged', 'success');
+            // Remove the instruction
+            const inst = instructions.find(i => i.id === id);
+            if (inst) {
+                const index = instructions.indexOf(inst);
+                instructions.splice(index, 1);
+                displayInstructions();
+
+                // Update notification count
+                const badge = document.querySelector('.notification-badge');
+                const count = parseInt(badge.getAttribute('data-count')) - 1;
+                badge.setAttribute('data-count', Math.max(0, count));
+            }
+        }
+
+        function markArrival() {
+            showToast('Arrival marked at current location', 'success');
+        }
+
+
+        function viewSchedule() {
+            showToast('Schedule feature coming soon', 'info');
+        }
+
+        function contactControl() {
+            showToast('Control Room: +91-40-1234-5678', 'info');
+        }
+
+        function toggleNotifications() {
+            showToast('You have 3 new notifications', 'info');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('driver_session');
+                window.location.href = 'driver-login.html';
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.5rem;">
+                        ${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}
+                    </span>
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Initialize on load
+        window.addEventListener('load', initPage);
+    </script>
+</body>
+
+</html>

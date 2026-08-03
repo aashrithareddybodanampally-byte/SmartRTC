@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartRTC - Login</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="glass-card login-card">
+            <a href="landing.html" class="back-link">← Back to Home</a>
+            <div class="login-header">
+                <div class="login-logo">🚌</div>
+                <h1 style="margin-bottom: 0.5rem;">SmartRTC</h1>
+                <p style="color: var(--text-secondary);">Intelligence Across Every Mile</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" id="username" placeholder="Enter username" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="password" placeholder="Enter password" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    Login to Dashboard
+                </button>
+            </form>
+
+            <div class="credentials-info">
+                <h4>Demo Credentials</h4>
+                <div class="credential-row">
+                    <strong>Admin:</strong>
+                    <span>admin / admin123</span>
+                </div>
+
+            </div>
+
+            <div style="margin-top: 2rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                <p>Enterprise Transport Analytics Platform</p>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Redirect if already logged in
+        if (TSRTC.auth.isAuthenticated()) {
+            window.location.href = 'dashboard.html';
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
+
+            console.log('🔐 Login attempt:', { username });
+
+            try {
+                const loginResult = await TSRTC.auth.login(username, password);
+                console.log('✅ Login successful:', loginResult);
+
+                TSRTC.notify.success('Login successful!');
+
+                // Verify token is saved
+                const savedToken = localStorage.getItem('auth_token');
+                console.log('💾 Token saved:', savedToken ? savedToken.substring(0, 20) + '...' : 'NO TOKEN');
+
+                console.log('🔄 Redirecting to dashboard...');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 500);
+            } catch (error) {
+                console.error('❌ Login failed:', error);
+                TSRTC.notify.error('Invalid credentials. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Login to Dashboard';
+            }
+        });
+    </script>
+</body>
+
+</html>

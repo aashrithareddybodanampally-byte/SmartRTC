@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>What-If Simulator - SmartRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        .simulator-panel {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .slider-container {
+            margin: 1.5rem 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--gradient-accent);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--gradient-accent);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        .comparison-card {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 18px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .comparison-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .impact-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .impact-positive {
+            background: rgba(46, 204, 113, 0.2);
+            color: var(--accent-green);
+        }
+
+        .impact-negative {
+            background: rgba(255, 71, 87, 0.2);
+            color: var(--accent-red);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">SmartRTC</div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="upload.html">Upload Data</a></li>
+                <li><a href="analytics.html">OD Analytics</a></li>
+                <li><a href="profitability.html">Profitability</a></li>
+                <li><a href="whatif-simulator.html" class="active">What-If Simulator</a></li>
+
+                <li><a href="maps.html">Maps</a></li>
+                <li><a href="#" onclick="TSRTC.auth.logout(); return false;">Logout</a></li>
+                <li class="user-info"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div style="margin-bottom: 2rem;">
+            <h1>🔬 What-If Scenario Simulator</h1>
+            <p style="color: var(--text-secondary);">Test strategic decisions before implementation</p>
+        </div>
+
+        <!-- Simulator Controls -->
+        <div class="simulator-panel" style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 2rem; text-align: center;">
+                Scenario Configuration
+            </h2>
+
+            <div class="grid grid-2">
+                <div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>💰 Fare Adjustment</span>
+                            <span id="fareValue" style="color: var(--accent-cyan);">0%</span>
+                        </div>
+                        <input type="range" class="slider" id="fareSlider" min="-50" max="50" value="0"
+                            oninput="updateSliderValue('fare', this.value)">
+                        <div
+                            style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            <span>-50%</span>
+                            <span>0%</span>
+                            <span>+50%</span>
+                        </div>
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>🚌 Frequency Adjustment</span>
+                            <span id="frequencyValue" style="color: var(--accent-cyan);">0%</span>
+                        </div>
+                        <input type="range" class="slider" id="frequencySlider" min="-50" max="100" value="0"
+                            oninput="updateSliderValue('frequency', this.value)">
+                        <div
+                            style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            <span>-50%</span>
+                            <span>0%</span>
+                            <span>+100%</span>
+                        </div>
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>👥 Capacity Change</span>
+                            <span id="capacityValue" style="color: var(--accent-cyan);">0%</span>
+                        </div>
+                        <input type="range" class="slider" id="capacitySlider" min="-30" max="30" value="0"
+                            oninput="updateSliderValue('capacity', this.value)">
+                        <div
+                            style="display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">
+                            <span>-30%</span>
+                            <span>0%</span>
+                            <span>+30%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div
+                        style="background: rgba(0, 212, 255, 0.05); border: 1px dashed rgba(0, 212, 255, 0.3); border-radius: 12px; padding: 1.5rem; height: 100%;">
+                        <h4 style="color: var(--accent-cyan); margin-bottom: 1rem;">💡 Scenario Insights</h4>
+                        <ul style="color: var(--text-secondary); line-height: 2;">
+                            <li><strong>Fare Changes:</strong> Higher fares reduce demand but increase revenue per
+                                passenger</li>
+                            <li><strong>Frequency:</strong> More buses improve service but increase operational costs
+                            </li>
+                            <li><strong>Capacity:</strong> Larger buses reduce trips but may increase waiting times</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="btn btn-primary" onclick="runSimulation()"
+                    style="font-size: 1.1rem; padding: 1rem 3rem;">
+                    ▶ Run Simulation
+                </button>
+                <button class="btn btn-secondary" onclick="resetSimulation()" style="margin-left: 1rem;">
+                    Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden">
+            <!-- Before/After Comparison -->
+            <div class="glass-card" style="margin-bottom: 2rem;">
+                <h2 style="margin-bottom: 2rem; text-align: center;">
+                    📊 Simulation Results
+                </h2>
+
+                <div class="grid grid-2" style="margin-bottom: 2rem;">
+                    <div class="comparison-card">
+                        <h3 style="color: var(--text-secondary); margin-bottom: 1.5rem; text-align: center;">
+                            📍 Current Scenario
+                        </h3>
+                        <div class="grid grid-2">
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                                    Passengers</div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);"
+                                    id="beforePassengers">-</div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                                    Revenue</div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);"
+                                    id="beforeRevenue">-</div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Profit
+                                </div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);"
+                                    id="beforeProfit">-</div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                                    Capacity</div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);"
+                                    id="beforeCapacity">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="comparison-card" style="border: 2px solid var(--accent-cyan);">
+                        <h3 style="color: var(--accent-cyan); margin-bottom: 1.5rem; text-align: center;">
+                            🎯 Projected Scenario
+                        </h3>
+                        <div class="grid grid-2">
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                                    Passengers</div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--accent-cyan);"
+                                    id="afterPassengers">-</div>
+                                <div id="passengersChange" class="impact-badge"></div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                                    Revenue</div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--accent-cyan);"
+                                    id="afterRevenue">-</div>
+                                <div id="revenueChange" class="impact-badge"></div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">Profit
+                                </div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--accent-cyan);"
+                                    id="afterProfit">-</div>
+                                <div id="profitChange" class="impact-badge"></div>
+                            </div>
+                            <div style="text-align: center; padding: 1rem;">
+                                <div style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">
+                                    Capacity</div>
+                                <div style="font-size: 2rem; font-weight: 700; color: var(--accent-cyan);"
+                                    id="afterCapacity">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROI Analysis -->
+                <div
+                    style="background: var(--gradient-accent); border-radius: 20px; padding: 2.5rem; text-align: center; color: var(--primary-bg); box-shadow: var(--shadow-glow); margin-top: 1rem; position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -20px; left: -20px; width: 100px; height: 100px; background: rgba(255,255,255,0.2); border-radius: 50%; filter: blur(40px);">
+                    </div>
+                    <h3 style="margin-bottom: 0.75rem; color: var(--primary-bg); font-size: 1.8rem;">Return on
+                        Investment (ROI)</h3>
+                    <div style="font-size: 4rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -2px;"
+                        id="roiValue">-</div>
+                    <p style="font-size: 1.25rem; font-weight: 600; opacity: 0.95;" id="roiDescription">-</p>
+                </div>
+            </div>
+
+            <!-- Comparison Chart -->
+            <div class="glass-card">
+                <h3 style="margin-bottom: 1.5rem;">Impact Visualization</h3>
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        TSRTC.requireAuth();
+
+        let currentParams = {
+            fare_change_percent: 0,
+            frequency_change_percent: 0,
+            capacity_change: 0
+        };
+
+        function updateSliderValue(type, value) {
+            if (type === 'fare') {
+                document.getElementById('fareValue').textContent = (value > 0 ? '+' : '') + value + '%';
+                currentParams.fare_change_percent = parseFloat(value);
+            } else if (type === 'frequency') {
+                document.getElementById('frequencyValue').textContent = (value > 0 ? '+' : '') + value + '%';
+                currentParams.frequency_change_percent = parseFloat(value);
+            } else if (type === 'capacity') {
+                document.getElementById('capacityValue').textContent = (value > 0 ? '+' : '') + value + '%';
+                currentParams.capacity_change = parseFloat(value);
+            }
+        }
+
+        async function runSimulation() {
+            try {
+                TSRTC.notify.info('Running simulation...');
+
+                const results = await TSRTC.api.runSimulation(currentParams);
+
+                // Show results section
+                document.getElementById('resultsSection').classList.remove('hidden');
+
+                // Update before values
+                document.getElementById('beforePassengers').textContent = TSRTC.formatNumber(results.before.passengers);
+                document.getElementById('beforeRevenue').textContent = TSRTC.formatCurrency(results.before.revenue);
+                document.getElementById('beforeProfit').textContent = TSRTC.formatCurrency(results.before.profit);
+                document.getElementById('beforeCapacity').textContent = results.before.capacity_utilization + '%';
+
+                // Update after values
+                document.getElementById('afterPassengers').textContent = TSRTC.formatNumber(results.after.passengers);
+                document.getElementById('afterRevenue').textContent = TSRTC.formatCurrency(results.after.revenue);
+                document.getElementById('afterProfit').textContent = TSRTC.formatCurrency(results.after.profit);
+                document.getElementById('afterCapacity').textContent = results.after.capacity_utilization + '%';
+
+                // Update change indicators
+                updateChangeIndicator('passengersChange', results.changes.passenger_change);
+                updateChangeIndicator('revenueChange', results.changes.revenue_change);
+                updateChangeIndicator('profitChange', results.changes.profit_change, true);
+
+                // Update ROI
+                document.getElementById('roiValue').textContent = TSRTC.formatPercentage(results.changes.roi);
+                const roiDesc = results.changes.roi > 20 ? 'Excellent investment opportunity' :
+                    results.changes.roi > 10 ? 'Good return expected' :
+                        results.changes.roi > 0 ? 'Moderate returns' :
+                            'Reconsider this scenario';
+                document.getElementById('roiDescription').textContent = roiDesc;
+
+                // Create comparison chart
+                TSRTC.chartManager.createBarChart(
+                    'comparisonChart',
+                    ['Passengers', 'Revenue', 'Profit', 'Capacity Util.'],
+                    [
+                        results.changes.passenger_change,
+                        results.changes.revenue_change,
+                        (results.changes.profit_change / results.before.profit) * 100,
+                        ((results.after.capacity_utilization - results.before.capacity_utilization) / results.before.capacity_utilization) * 100
+                    ],
+                    'Change (%)',
+                    '#00d4ff'
+                );
+
+                TSRTC.notify.success('Simulation completed successfully!');
+
+                // Scroll to results
+                document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (error) {
+                console.error('Simulation error:', error);
+                TSRTC.notify.error('Simulation failed. Please upload data first.');
+            }
+        }
+
+        function updateChangeIndicator(elementId, change, isCurrency = false) {
+            const element = document.getElementById(elementId);
+            const isPositive = change > 0;
+
+            element.className = `impact-badge ${isPositive ? 'impact-positive' : 'impact-negative'}`;
+            element.textContent = `${isPositive ? '▲' : '▼'} ${isCurrency ? TSRTC.formatCurrency(Math.abs(change)) : TSRTC.formatPercentage(Math.abs(change))}`;
+        }
+
+        function resetSimulation() {
+            document.getElementById('fareSlider').value = 0;
+            document.getElementById('frequencySlider').value = 0;
+            document.getElementById('capacitySlider').value = 0;
+
+            updateSliderValue('fare', 0);
+            updateSliderValue('frequency', 0);
+            updateSliderValue('capacity', 0);
+
+            document.getElementById('resultsSection').classList.add('hidden');
+
+            TSRTC.notify.info('Simulation reset');
+        }
+    </script>
+</body>
+
+</html>

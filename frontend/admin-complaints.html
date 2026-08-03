@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaints (Admin) - SmartRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">SmartRTC</div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="upload.html">Upload Data</a></li>
+                <li><a href="analytics.html">OD Analytics</a></li>
+                <li><a href="profitability.html">Profitability</a></li>
+                <li><a href="whatif-simulator.html">What-If Simulator</a></li>
+
+                <li><a href="admin-complaints.html" class="active">Complaints</a></li>
+                <li><a href="maps.html">Maps</a></li>
+                <li><a href="#" onclick="TSRTC.auth.logout(); return false;">Logout</a></li>
+                <li class="user-info"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="margin-bottom: 2rem;">
+            <h1>Complaints (Admin)</h1>
+            <p style="color: var(--text-secondary);">Anonymous complaints linked to crew. Admin only.</p>
+        </div>
+
+        <div class="grid grid-4" style="margin-bottom: 2rem;">
+            <div class="metric-card">
+                <div class="metric-label">Total</div>
+                <div class="metric-value" id="totalComplaints">0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Pending</div>
+                <div class="metric-value" id="pendingComplaints">0</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Crew with complaints</div>
+                <div class="metric-value" id="crewCount">0</div>
+            </div>
+        </div>
+
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem;">All complaints</h3>
+            <div id="complaintsList">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div class="glass-card">
+            <h3 style="margin-bottom: 1rem;">Crew performance (complaints linked)</h3>
+            <div id="crewPerformance"></div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        TSRTC.requireAuth();
+
+        async function loadComplaints() {
+            try {
+                const data = await TSRTC.api.getAllComplaints();
+
+                document.getElementById('totalComplaints').textContent = data.total || 0;
+                document.getElementById('pendingComplaints').textContent = data.pending || 0;
+
+                const crew = data.crew_performance || {};
+                document.getElementById('crewCount').textContent = Object.keys(crew).length;
+
+                const list = data.complaints || [];
+                document.getElementById('complaintsList').innerHTML = list.length === 0
+                    ? '\u003cp style=\"color: var(--text-muted); text-align: center; padding: 2rem;\"\u003eNo complaints found.\u003c/p\u003e'
+                    : `\u003ctable class=\"data-table\"\u003e
+                        \u003cthead\u003e
+                            \u003ctr\u003e
+                                \u003cth\u003eID\u003c/th\u003e
+                                \u003cth\u003eBus\u003c/th\u003e
+                                \u003cth\u003ePerson\u003c/th\u003e
+                                \u003cth\u003eCategory\u003c/th\u003e
+                                \u003cth\u003eStatus\u003c/th\u003e
+                                \u003cth\u003eDate\u003c/th\u003e
+                            \u003c/tr\u003e
+                        \u003c/thead\u003e
+                        \u003ctbody\u003e
+                            ${list.map(c => `
+                                \u003ctr\u003e
+                                    \u003ctd\u003e#${c.complaint_id}\u003c/td\u003e
+                                    \u003ctd style=\"font-weight: 600;\"\u003e${c.bus_number}\u003c/td\u003e
+                                    \u003ctd\u003e${c.person_name} \u003cspan style=\"opacity: 0.6; font-size: 0.8rem;\"\u003e(${c.person_type})\u003c/span\u003e\u003c/td\u003e
+                                    \u003ctd\u003e${(c.category || '').replace(/_/g, ' ')}\u003c/td\u003e
+                                    \u003ctd\u003e\u003cspan class=\"badge badge-${c.status === 'pending' ? 'info' : 'success'}\"\u003e${c.status}\u003c/span\u003e\u003c/td\u003e
+                                    \u003ctd\u003e${(c.timestamp || '').slice(0, 10)}\u003c/td\u003e
+                                \u003c/tr\u003e
+                            `).join('')}\u003c/tbody\u003e
+                    \u003c/table\u003e`;
+
+                document.getElementById('crewPerformance').innerHTML = Object.keys(crew).length === 0
+                    ? '\u003cp style=\"color: var(--text-muted); text-align: center;\"\u003eNo crew data available.\u003c/p\u003e'
+                    : Object.entries(crew).map(([id, v]) => `
+                        \u003cdiv style=\"padding: 1.25rem; margin-bottom: 1rem; background: rgba(255,255,255,0.03); border-radius: 12px; border: 1px solid var(--glass-border);\"\u003e
+                            \u003cdiv style=\"display: flex; justify-content: space-between; align-items: center;\"\u003e
+                                \u003cdiv\u003e
+                                    \u003cstrong style=\"font-size: 1.1rem; color: var(--accent-cyan);\"\u003e${v.name || id}\u003c/strong\u003e
+                                    \u003cspan style=\"margin-left: 0.5rem; opacity: 0.7;\"\u003e(${v.type || '\u2014'})\u003c/span\u003e
+                                \u003c/div\u003e
+                                \u003cspan class=\"badge badge-danger\"\u003e${v.total_complaints || 0} issues\u003c/span\u003e
+                            \u003c/div\u003e
+                            ${v.by_category && Object.keys(v.by_category).length ? `
+                                \u003cdiv style=\"font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.75rem; display: flex; gap: 1rem; flex-wrap: wrap;\"\u003e
+                                    ${Object.entries(v.by_category).map(([k, n]) => `
+                                        \u003cspan\u003e\u003cspan style=\"opacity: 0.6;\"\u003e${k.replace(/_/g, ' ')}:\u003c/span\u003e ${n}\u003c/span\u003e
+                                    `).join('')}\u003c/div\u003e` : ''}\u003c/div\u003e
+                    `).join('');
+
+                TSRTC.notify.success('Complaints history synchronized');
+            } catch (e) {
+                console.error('Error:', e);
+                TSRTC.notify.error('Failed to load complaints');
+                document.getElementById('complaintsList').innerHTML = '\u003cp style=\"color: var(--accent-red); text-align: center; padding: 2rem;\"\u003eFailed to load complaints. Ensure backend is running.\u003c/p\u003e';
+            }
+        }
+
+        window.addEventListener('load', loadComplaints);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profitability Analysis - TSRTC Analytics</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">SmartRTC</div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="upload.html">Upload Data</a></li>
+                <li><a href="analytics.html">OD Analytics</a></li>
+                <li><a href="profitability.html">Profitability</a></li>
+                <li><a href="whatif-simulator.html">What-If Simulator</a></li>
+
+                <li><a href="maps.html">Maps</a></li>
+                <li><a href="#" onclick="TSRTC.auth.logout(); return false;">Logout</a></li>
+                <li class="user-info"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div style="margin-bottom: 2rem;">
+            <h1>Route Profitability Engine</h1>
+            <p style="color: var(--text-secondary);">Identify profitable routes and optimize loss-making corridors</p>
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="grid grid-4" style="margin-bottom: 2rem;">
+            <div class="metric-card">
+                <div class="metric-label">Total Revenue</div>
+                <div class="metric-value" id="totalRevenue">-</div>
+                <div class="metric-change positive">100% of income</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Total Cost</div>
+                <div class="metric-value" id="totalCost">-</div>
+                <div class="metric-change negative">Operating expenses</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Net Profit</div>
+                <div class="metric-value" id="netProfit">-</div>
+                <div class="metric-change" id="profitChange">-</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Avg Margin</div>
+                <div class="metric-value" id="avgMargin">-</div>
+                <div class="metric-change info">Target: 15%</div>
+            </div>
+        </div>
+
+        <!-- Route Distribution -->
+        <div class="grid grid-2" style="margin-bottom: 2rem;">
+            <div class="glass-card">
+                <h3>Route Distribution</h3>
+                <div class="chart-container">
+                    <canvas id="routeDistChart"></canvas>
+                </div>
+            </div>
+            <div class="glass-card">
+                <h3>Profit Margin by Route</h3>
+                <div class="chart-container">
+                    <canvas id="marginChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profitable Routes -->
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3>✅ Top Profitable Routes</h3>
+                <span class="badge badge-success" id="profitableCount">0 routes</span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Route</th>
+                            <th>Passengers</th>
+                            <th>Revenue</th>
+                            <th>Cost</th>
+                            <th>Profit</th>
+                            <th>Margin</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="profitableTableBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 2rem;">
+                                Loading data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Loss-Making Routes -->
+        <div class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3>⚠️ Loss-Making Routes</h3>
+                <span class="badge badge-danger" id="lossCount">0 routes</span>
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Route</th>
+                            <th>Passengers</th>
+                            <th>Revenue</th>
+                            <th>Cost</th>
+                            <th>Loss</th>
+                            <th>Margin</th>
+                            <th>Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lossTableBody">
+                        <tr>
+                            <td colspan="8" style="text-align: center; padding: 2rem;">
+                                Loading data...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        TSRTC.requireAuth();
+
+        async function loadProfitability() {
+            try {
+                const data = await TSRTC.api.getProfitability();
+
+                // Update summary metrics
+                document.getElementById('totalRevenue').textContent = TSRTC.formatCurrency(data.summary.total_revenue);
+                document.getElementById('totalCost').textContent = TSRTC.formatCurrency(data.summary.total_cost);
+                document.getElementById('netProfit').textContent = TSRTC.formatCurrency(data.summary.net_profit);
+                document.getElementById('avgMargin').textContent = TSRTC.formatPercentage(data.summary.avg_profit_margin);
+
+                // Set profit change indicator
+                const profitChange = document.getElementById('profitChange');
+                if (data.summary.net_profit > 0) {
+                    profitChange.textContent = '▲ Profitable';
+                    profitChange.classList.add('positive');
+                } else {
+                    profitChange.textContent = '▼ Loss';
+                    profitChange.classList.add('negative');
+                }
+
+                // Update counts
+                document.getElementById('profitableCount').textContent = `${data.summary.profitable_count} routes`;
+                document.getElementById('lossCount').textContent = `${data.summary.loss_making_count} routes`;
+
+                // Route distribution pie chart
+                TSRTC.chartManager.createPieChart(
+                    'routeDistChart',
+                    ['Profitable Routes', 'Loss-Making Routes'],
+                    [data.summary.profitable_count, data.summary.loss_making_count],
+                    ['rgba(46, 204, 113, 0.8)', 'rgba(255, 71, 87, 0.8)']
+                );
+
+                // Top routes margin chart
+                const topRoutes = data.profitable_routes.slice(0, 10);
+                const routeLabels = topRoutes.map(r => r.route_name.substring(0, 25));
+                const margins = topRoutes.map(r => r.profit_margin);
+
+                TSRTC.chartManager.createBarChart(
+                    'marginChart',
+                    routeLabels,
+                    margins,
+                    'Profit Margin %',
+                    '#2ecc71'
+                );
+
+                // Profitable routes table
+                const profitableHTML = data.profitable_routes.map((route, index) => `
+                    <tr>
+                        <td style="font-weight: 600;">${index + 1}</td>
+                        <td>${route.route_name}</td>
+                        <td>${TSRTC.formatNumber(route.passenger_count)}</td>
+                        <td style="color: var(--accent-green);">${TSRTC.formatCurrency(route.total_revenue)}</td>
+                        <td>${TSRTC.formatCurrency(route.estimated_cost)}</td>
+                        <td style="font-weight: 600; color: var(--accent-green);">
+                            ${TSRTC.formatCurrency(route.profit)}
+                        </td>
+                        <td>
+                            <span class="badge badge-success">${route.profit_margin.toFixed(2)}%</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-secondary" style="font-size: 0.8rem; padding: 0.5rem 1rem;" 
+                                onclick="viewRouteDetails('${route.route_name}')">
+                                Details
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+                document.getElementById('profitableTableBody').innerHTML = profitableHTML || `
+                    <tr><td colspan="8" style="text-align: center;">No profitable routes found</td></tr>
+                `;
+
+                // Loss-making routes table
+                const lossHTML = data.loss_making_routes.map((route, index) => {
+                    const recommendation = Math.abs(route.profit_margin) > 50 ? 'Discontinue' :
+                        Math.abs(route.profit_margin) > 25 ? 'Optimize' : 'Monitor';
+                    const badgeClass = recommendation === 'Discontinue' ? 'badge-danger' :
+                        recommendation === 'Optimize' ? 'badge-info' : 'badge-secondary';
+
+                    return `
+                        <tr>
+                            <td style="font-weight: 600;">${index + 1}</td>
+                            <td>${route.route_name}</td>
+                            <td>${TSRTC.formatNumber(route.passenger_count)}</td>
+                            <td>${TSRTC.formatCurrency(route.total_revenue)}</td>
+                            <td style="color: var(--accent-red);">${TSRTC.formatCurrency(route.estimated_cost)}</td>
+                            <td style="font-weight: 600; color: var(--accent-red);">
+                                ${TSRTC.formatCurrency(Math.abs(route.profit))}
+                            </td>
+                            <td>
+                                <span class="badge badge-danger">${route.profit_margin.toFixed(2)}%</span>
+                            </td>
+                            <td>
+                                <span class="badge ${badgeClass}">${recommendation}</span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+                document.getElementById('lossTableBody').innerHTML = lossHTML || `
+                    <tr><td colspan="8" style="text-align: center;">No loss-making routes found</td></tr>
+                `;
+
+                TSRTC.notify.success('Profitability analysis loaded');
+
+            } catch (error) {
+                console.error('Error loading profitability:', error);
+                TSRTC.notify.error('Failed to load profitability data');
+            }
+        }
+
+        function viewRouteDetails(routeName) {
+            TSRTC.createModal(
+                `Route Details: ${routeName}`,
+                `
+                    <div style="color: var(--text-secondary);">
+                        <p style="margin-bottom: 1rem;">
+                            Detailed route analysis and optimization recommendations will be displayed here.
+                        </p>
+                        <p>This route can be analyzed further using the What-If Simulator.</p>
+                    </div>
+                    <a href="simulator.html" class="btn btn-primary mt-3">
+                        Open Simulator →
+                    </a>
+                `
+            );
+        }
+
+        window.addEventListener('load', loadProfitability);
+    </script>
+</body>
+
+</html>

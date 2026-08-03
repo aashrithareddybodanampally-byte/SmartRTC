@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maps - SmartRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        #map {
+            height: 600px;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+
+        .stop-marker {
+            background: var(--gradient-accent);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-bg);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.6);
+        }
+
+        .legend {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .stop-info-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border: 1px solid var(--glass-border);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">SmartRTC</div>
+            <ul class="nav-links">
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="upload.html">Upload Data</a></li>
+                <li><a href="analytics.html">OD Analytics</a></li>
+                <li><a href="profitability.html">Profitability</a></li>
+                <li><a href="whatif-simulator.html">What-If Simulator</a></li>
+
+                <li><a href="maps.html">Maps</a></li>
+                <li><a href="#" onclick="TSRTC.auth.logout(); return false;">Logout</a></li>
+                <li class="user-info"></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div style="margin-bottom: 2rem;">
+            <h1>🗺️ Geographical Analytics</h1>
+            <p style="color: var(--text-secondary);">Interactive map of bus stops and demand corridors</p>
+        </div>
+
+        <div class="grid grid-3" style="margin-bottom: 2rem;">
+            <div class="glass-card">
+                <h4 style="margin-bottom: 1rem;">Map Controls</h4>
+                <div class="form-group">
+                    <label class="form-label">Visualization Mode</label>
+                    <select class="form-select" id="vizMode" onchange="updateVisualization()">
+                        <option value="stops">All Stops</option>
+                        <option value="demand">Demand Intensity</option>
+                        <option value="corridors">Top Corridors</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Demand Threshold</label>
+                    <input type="range" class="slider" min="0" max="2000" value="0" id="demandFilter"
+                        oninput="filterByDemand(this.value)">
+                    <div style="text-align: center; margin-top: 0.5rem; color: var(--accent-cyan);">
+                        <span id="demandValue">All stops</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card" style="grid-column: span 2;">
+                <h4 style="margin-bottom: 1rem;">Map Legend</h4>
+                <div class="grid grid-3">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-green);"></div>
+                        <span>High Demand (>1000)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-cyan);"></div>
+                        <span>Medium Demand (500-1000)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: var(--accent-red);"></div>
+                        <span>Low Demand (<500)< /span>
+                    </div>
+                </div>
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--glass-border);">
+                    <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Click on any stop to view detailed statistics. Lines represent major corridors.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="glass-card">
+            <div id="map"></div>
+        </div>
+
+        <!-- Stop Details Panel -->
+        <div id="stopDetailsPanel" class="glass-card hidden" style="margin-top: 2rem;">
+            <h3 style="margin-bottom: 1.5rem;">Stop Details</h3>
+            <div id="stopDetailsContent">
+                <!-- Will be populated when a stop is clicked -->
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="grid grid-4" style="margin-top: 2rem;">
+            <div class="metric-card">
+                <div class="metric-label">Total Stops</div>
+                <div class="metric-value" id="totalStops">-</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Top Corridors</div>
+                <div class="metric-value" id="topCorridors">-</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Coverage Area</div>
+                <div class="metric-value" id="coverageArea">~500km²</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Network Density</div>
+                <div class="metric-value" id="networkDensity">High</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        TSRTC.requireAuth();
+
+        let map;
+        let markers = [];
+        let corridorLines = [];
+        let geoData = null;
+
+        // Initialize map
+        function initMap() {
+            map = L.map('map').setView([17.385044, 78.486671], 11);
+
+            // Dark theme tile layer
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+        }
+
+        async function loadMapData() {
+            try {
+                geoData = await TSRTC.api.getGeoData();
+
+                // Update statistics
+                document.getElementById('totalStops').textContent = geoData.stops.length;
+                document.getElementById('topCorridors').textContent = geoData.corridors.length;
+
+                // Plot stops
+                plotStops(geoData.stops);
+
+                // Draw corridors
+                drawCorridors(geoData.corridors);
+
+                // Center map
+                if (geoData.center) {
+                    map.setView([geoData.center.lat, geoData.center.lng], 11);
+                }
+
+                TSRTC.notify.success('Map data loaded successfully');
+
+            } catch (error) {
+                console.error('Error loading map data:', error);
+                TSRTC.notify.error('Failed to load map data. Please upload data first.');
+            }
+        }
+
+        function plotStops(stops) {
+            // Clear existing markers
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+
+            stops.forEach(stop => {
+                // Determine color based on demand
+                const demand = stop.total_demand;
+                const color = demand > 1000 ? '#2ecc71' :
+                    demand > 500 ? '#00d4ff' : '#ff4757';
+
+                // Create custom icon
+                const icon = L.divIcon({
+                    className: 'stop-marker',
+                    html: `<div style="width: 100%; height: 100%; background: ${color}; border-radius: 50%; border: 3px solid #0a0e27;"></div>`,
+                    iconSize: [20, 20]
+                });
+
+                // Create marker
+                const marker = L.marker([stop.lat, stop.lng], { icon })
+                    .addTo(map)
+                    .bindPopup(`
+                        <div style="color: #0a0e27; padding: 0.5rem;">
+                            <h4 style="margin-bottom: 0.5rem; color: #0a0e27;">${stop.name}</h4>
+                            <div style="font-size: 0.9rem;">
+                                <p><strong>Boarding:</strong> ${TSRTC.formatNumber(stop.boarding)}</p>
+                                <p><strong>Alighting:</strong> ${TSRTC.formatNumber(stop.alighting)}</p>
+                                <p><strong>Total Demand:</strong> ${TSRTC.formatNumber(stop.total_demand)}</p>
+                                <p><strong>Peak Hour:</strong> ${stop.peak_hour}:00</p>
+                            </div>
+                        </div>
+                    `)
+                    .on('click', () => showStopDetails(stop));
+
+                markers.push(marker);
+            });
+        }
+
+        function drawCorridors(corridors) {
+            // Clear existing lines
+            corridorLines.forEach(l => map.removeLayer(l));
+            corridorLines = [];
+
+            corridors.forEach(corridor => {
+                // Determine line width based on demand
+                const weight = Math.max(2, Math.min(corridor.demand / 200, 8));
+                const opacity = Math.max(0.3, Math.min(corridor.demand / 2000, 0.9));
+
+                const line = L.polyline(
+                    [corridor.from_coords, corridor.to_coords],
+                    {
+                        color: '#00d4ff',
+                        weight: weight,
+                        opacity: opacity
+                    }
+                ).addTo(map)
+                    .bindPopup(`
+                    <div style="color: #0a0e27; padding: 0.5rem;">
+                        <h4 style="color: #0a0e27;">${corridor.from} → ${corridor.to}</h4>
+                        <p><strong>Demand:</strong> ${TSRTC.formatNumber(corridor.demand)} passengers</p>
+                    </div>
+                `);
+
+                corridorLines.push(line);
+            });
+        }
+
+        function showStopDetails(stop) {
+            const panel = document.getElementById('stopDetailsPanel');
+            const content = document.getElementById('stopDetailsContent');
+
+            content.innerHTML = `
+                <h2 style="color: var(--accent-cyan); margin-bottom: 1.5rem;">${stop.name}</h2>
+                
+                <div class="grid grid-2" style="margin-bottom: 2rem;">
+                    <div class="stop-info-card">
+                        <div class="metric-label">Boarding Passengers</div>
+                        <div class="metric-value" style="font-size: 2rem;">${TSRTC.formatNumber(stop.boarding)}</div>
+                    </div>
+                    <div class="stop-info-card">
+                        <div class="metric-label">Alighting Passengers</div>
+                        <div class="metric-value" style="font-size: 2rem;">${TSRTC.formatNumber(stop.alighting)}</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-2">
+                    <div>
+                        <h4 style="margin-bottom: 1rem;">Location Details</h4>
+                        <div class="stop-info-card">
+                            <p style="color: var(--text-secondary);">
+                                <strong>Coordinates:</strong><br>
+                                ${stop.lat.toFixed(6)}, ${stop.lng.toFixed(6)}
+                            </p>
+                            <p style="color: var(--text-secondary); margin-top: 0.75rem;">
+                                <strong>Peak Hour:</strong> ${stop.peak_hour}:00
+                            </p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 1rem;">Demand Analysis</h4>
+                        <div class="stop-info-card">
+                            <p style="color: var(--text-secondary);">
+                                <strong>Total Demand:</strong> ${TSRTC.formatNumber(stop.total_demand)}
+                            </p>
+                            <p style="color: var(--text-secondary); margin-top: 0.75rem;">
+                                <strong>Status:</strong> 
+                                <span class="badge ${stop.total_demand > 1000 ? 'badge-success' : stop.total_demand > 500 ? 'badge-info' : 'badge-danger'}">
+                                    ${stop.total_demand > 1000 ? 'High Traffic' : stop.total_demand > 500 ? 'Medium Traffic' : 'Low Traffic'}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            panel.classList.remove('hidden');
+            panel.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateVisualization() {
+            const mode = document.getElementById('vizMode').value;
+
+            if (mode === 'stops') {
+                markers.forEach(m => m.addTo(map));
+                corridorLines.forEach(l => map.removeLayer(l));
+            } else if (mode === 'corridors') {
+                corridorLines.forEach(l => l.addTo(map));
+                markers.forEach(m => m.addTo(map));
+            } else if (mode === 'demand') {
+                markers.forEach(m => m.addTo(map));
+                corridorLines.forEach(l => l.addTo(map));
+            }
+        }
+
+        function filterByDemand(value) {
+            const threshold = parseInt(value);
+            document.getElementById('demandValue').textContent =
+                threshold === 0 ? 'All stops' : `Demand > ${threshold}`;
+
+            if (!geoData) return;
+
+            const filteredStops = threshold === 0
+                ? geoData.stops
+                : geoData.stops.filter(s => s.total_demand >= threshold);
+
+            plotStops(filteredStops);
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            initMap();
+            loadMapData();
+        });
+    </script>
+</body>
+
+</html>

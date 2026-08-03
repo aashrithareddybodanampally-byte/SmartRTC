@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver/Conductor Login - SmartRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <style>
+        .driver-login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .driver-login-card {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .driver-login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .driver-login-logo {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="driver-login-container">
+        <div class="glass-card driver-login-card">
+            <a href="landing.html" class="back-link">← Back to Home</a>
+
+            <div class="driver-login-header">
+                <div class="driver-login-logo">🚍</div>
+                <h1 style="margin-bottom: 0.5rem;">Driver & Conductor Portal</h1>
+                <p style="color: var(--text-secondary);">Access your route information and updates</p>
+            </div>
+
+            <form id="driverLoginForm">
+                <div class="form-group">
+                    <label class="form-label">Employee ID</label>
+                    <input type="text" class="form-input" id="employeeId" placeholder="Enter your employee ID" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="password" placeholder="Enter your password" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select class="form-select" id="role" required>
+                        <option value="">Select your role</option>
+                        <option value="driver">Driver</option>
+                        <option value="conductor">Conductor</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    Login to Portal
+                </button>
+            </form>
+
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+                <div
+                    style="background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 12px; padding: 1rem;">
+                    <h4 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--accent-cyan);">Demo Credentials
+                    </h4>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>Driver:</strong> D001 / driver123
+                        </div>
+                        <div>
+                            <strong>Conductor:</strong> C001 / conductor123
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; text-align: center; color: var(--text-muted); font-size: 0.85rem;">
+                <p>For assistance, contact your depot supervisor</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Demo driver/conductor accounts
+        const accounts = {
+            'D001': { password: 'driver123', role: 'driver', name: 'Rajesh Kumar', busNo: '100' },
+            'D002': { password: 'driver123', role: 'driver', name: 'Suresh Reddy', busNo: '49M' },
+            'D003': { password: 'driver123', role: 'driver', name: 'Venkat Rao', busNo: '5K' },
+            'C001': { password: 'conductor123', role: 'conductor', name: 'Lakshmi Devi', busNo: '100' },
+            'C002': { password: 'conductor123', role: 'conductor', name: 'Priya Sharma', busNo: '49M' },
+            'C003': { password: 'conductor123', role: 'conductor', name: 'Manjula Bai', busNo: '5K' }
+        };
+
+        document.getElementById('driverLoginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const employeeId = document.getElementById('employeeId').value;
+            const password = document.getElementById('password').value;
+            const role = document.getElementById('role').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
+
+            // Simulate API call
+            setTimeout(() => {
+                const account = accounts[employeeId];
+
+                if (!account) {
+                    showToast('Invalid employee ID', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Login to Portal';
+                    return;
+                }
+
+                if (account.password !== password) {
+                    showToast('Invalid password', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Login to Portal';
+                    return;
+                }
+
+                if (account.role !== role) {
+                    showToast('Role mismatch. Please select the correct role.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Login to Portal';
+                    return;
+                }
+
+                // Store session
+                localStorage.setItem('driver_session', JSON.stringify({
+                    employeeId,
+                    name: account.name,
+                    role: account.role,
+                    busNo: account.busNo,
+                    loginTime: new Date().toISOString()
+                }));
+
+                showToast('Login successful!', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'driver-dashboard.html';
+                }, 500);
+            }, 800);
+        });
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span style="font-size: 1.5rem;">
+                        ${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}
+                    </span>
+                    <span>${message}</span>
+                </div>
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+
+</html>

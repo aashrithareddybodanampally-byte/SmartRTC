@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner - Ticket Verification | SmartRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        .scanner-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        #qrReader {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 1.5rem 0;
+        }
+
+        .verification-result {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-valid {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+        }
+
+        .status-invalid {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+        }
+
+        .ticket-details {
+            margin-top: 1.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .manual-entry {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .scan-button {
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            color: #fff;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .scan-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
+        }
+
+        .stop-button {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+
+        .info-box {
+            background: rgba(6, 182, 212, 0.1);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">SmartRTC</div>
+            <ul class="nav-links">
+                <li><a href="landing.html">Home</a></li>
+                <li><a href="booking.html">Book Ticket</a></li>
+                <li><a href="qr-scanner.html" class="active">Scan QR</a></li>
+                <li><a href="users.html">Track</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div style="margin-bottom: 2rem;">
+            <h1>🔍 QR Code Scanner</h1>
+            <p style="color: var(--text-secondary);">Scan ticket QR code for verification</p>
+        </div>
+
+        <div class="scanner-container">
+            <div class="info-box">
+                <strong>📱 How to use:</strong> Click the button below to start scanning. Hold the QR code in front of
+                your camera.
+            </div>
+
+            <button id="scanButton" class="scan-button" onclick="toggleScanner()">
+                📷 Start Camera Scan
+            </button>
+
+            <div id="qrReader" style="display: none;"></div>
+
+            <div class="manual-entry">
+                <h3>📝 Manual Entry</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem;">
+                    If you can't scan the QR code, enter the ticket ID manually:
+                </p>
+                <div class="form-group">
+                    <input type="text" id="manualTicketId" placeholder="Enter Ticket ID (e.g., TKT20260213...)">
+                </div>
+                <button onclick="verifyManual()" class="btn btn-secondary" style="width: 100%;">
+                    Verify Ticket
+                </button>
+            </div>
+        </div>
+
+        <div id="verificationResult" style="display: none;"></div>
+    </div>
+
+    <script>
+        let html5QrCode = null;
+        let isScanning = false;
+
+        function toggleScanner() {
+            if (isScanning) {
+                stopScanning();
+            } else {
+                startScanning();
+            }
+        }
+
+        async function startScanning() {
+            const qrReader = document.getElementById('qrReader');
+            const scanButton = document.getElementById('scanButton');
+
+            qrReader.style.display = 'block';
+            scanButton.textContent = '⏸️ Stop Scanning';
+            scanButton.classList.add('stop-button');
+            isScanning = true;
+
+            html5QrCode = new Html5Qrcode("qrReader");
+
+            try {
+                await html5QrCode.start(
+                    { facingMode: "environment" },
+                    {
+                        fps: 10,
+                        qrbox: { width: 250, height: 250 }
+                    },
+                    onScanSuccess,
+                    onScanFailure
+                );
+            } catch (err) {
+                console.error('Unable to start scanner:', err);
+                alert('Unable to access camera. Please check camera permissions or use manual entry.');
+                stopScanning();
+            }
+        }
+
+        async function stopScanning() {
+            if (html5QrCode) {
+                try {
+                    await html5QrCode.stop();
+                } catch (err) {
+                    console.error('Error stopping scanner:', err);
+                }
+            }
+
+            document.getElementById('qrReader').style.display = 'none';
+            document.getElementById('scanButton').textContent = '📷 Start Camera Scan';
+            document.getElementById('scanButton').classList.remove('stop-button');
+            isScanning = false;
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`QR Code scanned: ${decodedText}`);
+
+            try {
+                // Parse QR data (JSON format from our booking system)
+                const data = JSON.parse(decodedText);
+
+                if (data.ticket_id) {
+                    stopScanning();
+                    verifyTicket(data.ticket_id);
+                }
+            } catch (e) {
+                // If not JSON, try as plain ticket ID
+                if (decodedText.startsWith('TKT')) {
+                    stopScanning();
+                    verifyTicket(decodedText);
+                }
+            }
+        }
+
+        function onScanFailure(error) {
+            // Scanning failure is normal, don't log it
+        }
+
+        async function verifyManual() {
+            const ticketId = document.getElementById('manualTicketId').value.trim();
+
+            if (!ticketId) {
+                alert('Please enter a ticket ID');
+                return;
+            }
+
+            await verifyTicket(ticketId);
+        }
+
+        async function verifyTicket(ticketId) {
+            try {
+                const response = await fetch(`http://localhost:8000/api/tickets/verify/${ticketId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    displayVerification(data);
+                } else {
+                    displayError(data.detail || 'Ticket not found');
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                displayError('Failed to verify ticket. Ensure backend server is running.');
+            }
+        }
+
+        function displayVerification(data) {
+            const resultDiv = document.getElementById('verificationResult');
+            const ticket = data.ticket;
+            const isValid = data.valid;
+
+            resultDiv.innerHTML = `
+                <div class="verification-result">
+                    <div class="status-badge ${isValid ? 'status-valid' : 'status-invalid'}">
+                        ${isValid ? '✅ VALID TICKET' : '❌ INVALID TICKET'}
+                    </div>
+
+                    <h3>${data.message}</h3>
+
+                    <div class="ticket-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Ticket ID:</span>
+                            <span class="detail-value">${ticket.ticket_id}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Passenger Name:</span>
+                            <span class="detail-value">${ticket.passenger_name}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Phone:</span>
+                            <span class="detail-value">${ticket.passenger_phone}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Fare Paid:</span>
+                            <span class="detail-value">₹${ticket.fare_amount}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Distance Allowed:</span>
+                            <span class="detail-value">${ticket.distance_km} km</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Travel Date:</span>
+                            <span class="detail-value">${ticket.travel_date}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Valid Until:</span>
+                            <span class="detail-value">${new Date(ticket.valid_until).toLocaleString()}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Payment Method:</span>
+                            <span class="detail-value">${ticket.payment_method.toUpperCase().replace('_', ' ')}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value" style="color: ${isValid ? '#10b981' : '#ef4444'}">
+                                ${ticket.status.toUpperCase()}
+                            </span>
+                        </div>
+                    </div>
+
+                    <button onclick="scanAnother()" class="btn btn-primary" style="margin-top: 1.5rem; width: 100%;">
+                        Scan Another Ticket
+                    </button>
+                </div>
+            `;
+
+            resultDiv.style.display = 'block';
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function displayError(message) {
+            const resultDiv = document.getElementById('verificationResult');
+
+            resultDiv.innerHTML = `
+                <div class="verification-result">
+                    <div class="status-badge status-invalid">
+                        ❌ ERROR
+                    </div>
+
+                    <h3>${message}</h3>
+
+                    <button onclick="scanAnother()" class="btn btn-secondary" style="margin-top: 1.5rem; width: 100%;">
+                        Try Again
+                    </button>
+                </div>
+            `;
+
+            resultDiv.style.display = 'block';
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scanAnother() {
+            document.getElementById('verificationResult').style.display = 'none';
+            document.getElementById('manualTicketId').value = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>

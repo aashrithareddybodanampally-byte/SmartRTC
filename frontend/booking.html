@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Ticket - SmartRTC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        .page-header {
+            margin-bottom: 2.5rem;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .booking-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.4s ease;
+        }
+
+        .booking-card:hover {
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row label {
+            min-width: 180px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        .form-row input {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            transition: all 0.3s ease;
+        }
+
+        .form-row input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .fare-display-container {
+            text-align: center;
+            margin: 3rem 0;
+            padding: 2rem;
+            background: rgba(0, 212, 255, 0.03);
+            border-radius: 16px;
+            border: 1px dashed var(--glass-border);
+        }
+
+        .fare-amount-large {
+            font-family: var(--font-display);
+            font-size: 4.5rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .validity-tip {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .payment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .payment-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .payment-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-blue);
+        }
+
+        .payment-card.selected {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--accent-blue);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .payment-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .payment-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-family: var(--font-display);
+            text-transform: uppercase;
+        }
+
+        .ticket-display {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .qr-container {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 2rem 0;
+        }
+
+        .ticket-info {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .ticket-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .ticket-row:last-child {
+            border: none;
+        }
+
+        .ticket-label {
+            color: var(--text-secondary);
+            font-family: var(--font-display);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .ticket-value {
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+            border-top-color: var(--primary-bg);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">SmartRTC</div>
+            <ul class="nav-links">
+                <li><a href="landing.html">Home</a></li>
+                <li><a href="booking.html" class="active">Book Ticket</a></li>
+                <li><a href="users.html">Track</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Booking Form -->
+        <div id="bookingForm" class="booking-card">
+            <h1>Enter Travel Details</h1>
+
+            <div class="booking-section">
+                <div class="form-row">
+                    <label>Fare Amount (₹)</label>
+                    <input type="number" id="fareAmount" min="10" max="500" step="10" value="100">
+                </div>
+
+                <div class="fare-display-container">
+                    <div class="fare-amount-large" id="fareDisplay">₹100 = 50 km</div>
+                    <div class="validity-tip">✨ Valid on any bus for calculated distance</div>
+                </div>
+
+                <div class="form-row">
+                    <label>Passenger Name</label>
+                    <input type="text" id="passengerName" placeholder="Enter full name">
+                </div>
+
+                <div class="form-row">
+                    <label>Phone Number</label>
+                    <input type="tel" id="passengerPhone" placeholder="Enter 10-digit phone number" maxlength="10">
+                </div>
+
+                <div class="form-row">
+                    <label>Email (Optional)</label>
+                    <input type="email" id="passengerEmail" placeholder="Enter email address">
+                </div>
+
+                <div class="form-row">
+                    <label>Travel Date</label>
+                    <input type="date" id="travelDate">
+                </div>
+            </div>
+
+            <h2 class="section-title">Select Payment Method</h2>
+            <div class="payment-grid">
+                <div class="payment-card" data-payment="upi">
+                    <span class="payment-icon">📱</span>
+                    <div class="payment-label">UPI</div>
+                </div>
+                <div class="payment-card" data-payment="card">
+                    <span class="payment-icon">💳</span>
+                    <div class="payment-label">Card</div>
+                </div>
+                <div class="payment-card" data-payment="netbanking">
+                    <span class="payment-icon">🏦</span>
+                    <div class="payment-label">Net Banking</div>
+                </div>
+                <div class="payment-card" data-payment="wallet_paytm">
+                    <span class="payment-icon">👛</span>
+                    <div class="payment-label">Paytm</div>
+                </div>
+                <div class="payment-card" data-payment="wallet_phonepe">
+                    <span class="payment-icon">📲</span>
+                    <div class="payment-label">PhonePe</div>
+                </div>
+                <div class="payment-card" data-payment="wallet_googlepay">
+                    <span class="payment-icon">💰</span>
+                    <div class="payment-label">GooglePay</div>
+                </div>
+            </div>
+
+            <button onclick="processBooking()" class="btn btn-primary" id="bookBtn"
+                style="width: 100%; padding: 1.25rem; font-size: 1.2rem; margin-top: 3rem;">
+                Book Ticket
+            </button>
+        </div>
+
+        <!-- Ticket Display -->
+        <div id="ticketDisplay" class="ticket-display" style="display: none;">
+            <div class="success-icon">🎉</div>
+            <h2 class="section-title">Booking Successful!</h2>
+
+            <div class="qr-container">
+                <div id="qrCode"></div>
+            </div>
+
+            <div class="ticket-info">
+                <div class="ticket-row">
+                    <span class="ticket-label">Ticket ID</span>
+                    <span class="ticket-value" id="ticketId">-</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Transaction ID</span>
+                    <span class="ticket-value" id="transactionId" style="font-size: 0.9rem;">-</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Passenger</span>
+                    <span class="ticket-value" id="ticketName">-</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Fare Paid</span>
+                    <span class="ticket-value" id="ticketFare">-</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Travel Distance</span>
+                    <span class="ticket-value" id="ticketDistance">-</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Valid Until</span>
+                    <span class="ticket-value" id="ticketExpiry">-</span>
+                </div>
+                <div class="ticket-row">
+                    <span class="ticket-label">Payment Method</span>
+                    <span class="ticket-value" id="ticketPayment">-</span>
+                </div>
+            </div>
+
+            <button onclick="downloadTicket()" class="btn btn-primary" style="margin-top: 1.5rem; width: 100%;">
+                📥 Download Ticket
+            </button>
+
+            <button onclick="bookAnother()" class="btn btn-secondary" style="margin-top: 1rem; width: 100%;">
+                ← Book Another Ticket
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let selectedPayment = null;
+        let currentTicket = null;
+
+        // Set today as minimum date
+        document.getElementById('travelDate').min = new Date().toISOString().split('T')[0];
+        document.getElementById('travelDate').value = new Date().toISOString().split('T')[0];
+
+        // Fare calculator
+        document.getElementById('fareAmount').addEventListener('input', function () {
+            const fare = parseFloat(this.value) || 0;
+            const distance = (fare / 2).toFixed(2);
+            document.getElementById('fareDisplay').textContent = `₹${fare} = ${distance} km`;
+        });
+
+        // Payment method selection
+        document.querySelectorAll('.payment-card').forEach(card => {
+            card.addEventListener('click', function () {
+                document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPayment = this.getAttribute('data-payment');
+            });
+        });
+
+        async function processBooking() {
+            const fareAmount = parseFloat(document.getElementById('fareAmount').value);
+            const passengerName = document.getElementById('passengerName').value.trim();
+            const passengerPhone = document.getElementById('passengerPhone').value.trim();
+            const passengerEmail = document.getElementById('passengerEmail').value.trim();
+            const travelDate = document.getElementById('travelDate').value;
+
+            if (!fareAmount || fareAmount < 10 || fareAmount > 500) {
+                alert('⚠️ Please enter fare between ₹10 and ₹500');
+                return;
+            }
+
+            if (!passengerName) {
+                alert('⚠️ Please enter passenger name');
+                return;
+            }
+
+            if (!passengerPhone || passengerPhone.length !== 10) {
+                alert('⚠️ Please enter valid 10-digit phone');
+                return;
+            }
+
+            if (!travelDate) {
+                alert('⚠️ Please select travel date');
+                return;
+            }
+
+            if (!selectedPayment) {
+                alert('⚠️ Please select payment method');
+                return;
+            }
+
+            const btn = document.getElementById('bookBtn');
+            btn.innerHTML = '🔄 Processing Payment<span class="loading-spinner"></span>';
+            btn.disabled = true;
+
+            try {
+                // Simulate payment delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                const data = await TSRTC.api.createFareBasedBooking({
+                    fare_amount: fareAmount,
+                    passenger_name: passengerName,
+                    passenger_phone: passengerPhone,
+                    passenger_email: passengerEmail || null,
+                    travel_date: travelDate,
+                    payment_method: selectedPayment
+                });
+
+                if (data.success) {
+                    currentTicket = data;
+                    displayTicket(data);
+                    TSRTC.notify.success('Ticket booked successfully!');
+                } else {
+                    TSRTC.notify.error('Booking failed: ' + (data.detail || 'Unknown error'));
+                    btn.innerHTML = '🎟️ Book Now & Pay';
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Booking error:', error);
+                TSRTC.notify.error('Failed to process booking. Please ensure the server is running.');
+                btn.innerHTML = '🎟️ Book Now & Pay';
+                btn.disabled = false;
+            }
+        }
+
+        function displayTicket(data) {
+            document.getElementById('bookingForm').style.display = 'none';
+            document.getElementById('ticketDisplay').style.display = 'block';
+
+            // Generate demo transaction ID
+            const txnId = 'TXN' + Date.now() + Math.floor(Math.random() * 1000);
+
+            const qrData = JSON.stringify(data.qr_data);
+            document.getElementById('qrCode').innerHTML = '';
+            QRCode.toCanvas(qrData, {
+                width: 200,
+                margin: 2,
+                color: { dark: '#000', light: '#FFF' }
+            }, (err, canvas) => {
+                if (!err) document.getElementById('qrCode').appendChild(canvas);
+            });
+
+            document.getElementById('ticketId').textContent = data.ticket_id;
+            document.getElementById('transactionId').textContent = txnId;
+            document.getElementById('ticketName').textContent = data.qr_data.passenger;
+            document.getElementById('ticketFare').textContent = `₹${data.fare_amount}`;
+            document.getElementById('ticketDistance').textContent = `${data.distance_km} km`;
+            document.getElementById('ticketExpiry').textContent = new Date(data.valid_until).toLocaleString();
+            document.getElementById('ticketPayment').textContent = selectedPayment.toUpperCase().replace('_', ' ');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function downloadTicket() {
+            const canvas = document.querySelector('#qrCode canvas');
+            const link = document.createElement('a');
+            link.download = `ticket_${currentTicket.ticket_id}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        function bookAnother() {
+            document.getElementById('bookingForm').style.display = 'block';
+            document.getElementById('ticketDisplay').style.display = 'none';
+            document.getElementById('passengerName').value = '';
+            document.getElementById('passengerEmail').value = '';
+            document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
+            selectedPayment = null;
+            document.getElementById('bookBtn').innerHTML = '🎟️ Book Now & Pay';
+            document.getElementById('bookBtn').disabled = false;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>
